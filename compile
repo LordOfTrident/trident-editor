@@ -1,0 +1,19 @@
+# compile
+
+printf "\e[0;36m* CMPL: \e[0;33mCreating ./bin/\n\e[0m";
+mkdir -p bin
+printf "\e[0;36m* CMPL: \e[0;33mChecking if g++ is installed\n\e[0m"
+sudo apt install g++
+printf "\e[0;36m* CMPL: \e[0;33mChecking if required libraries are installed\n\e[0m"
+sudo apt-get install libncurses5-dev libncursesw5-dev;
+printf "\e[0;36m* CMPL: \e[0;33mCompiling...\n\e[0m";
+
+if g++ -g src/*.cc -o bin/tred -O3 -s -Wall -std=c++17 -lncursesw; then
+    printf "\e[0;36m* CMPL: \e[0;32mCompiled Succesfully\n";
+
+    printf "\e[0;36m* CMPL: \e[0;33mCopying binary "tred" to /usr/bin...\n\e[0m";
+    sudo cp ./bin/tred /usr/bin/
+    printf "\e[0;36m* CMPL: \e[0;32mDone.\n";
+else
+    printf "\e[0;36m* CMPL: \e[0;31mCompilation Failed\n";
+fi
