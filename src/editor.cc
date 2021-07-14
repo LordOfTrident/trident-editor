@@ -37,8 +37,7 @@ LUIC::editor::editor(ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_f
     colorscheme = {
         __LUIC__SHDWCLR,
         __LUIC__TXTCLR,
-        __LUIC__TXTCLR,
-        __LUIC__SYSCLR
+        __LUIC__TXTCLR
     };
     
     posx = p_posx;
@@ -72,8 +71,7 @@ void LUIC::editor::draw() {
 
     if (parent == NULL) wnd .drawshdw (colorscheme[0]);
 
-    if (prsd)       wnd .setbgclr (colorscheme[3]);
-    else            wnd .setbgclr (colorscheme[2]);
+    wnd .setbgclr (colorscheme[2]);
 
     str ftxt = __shptxtbuf(txt, scrx, scry, getszx() + scrx, getszy() + scry);
 

@@ -11,4 +11,9 @@ tred
 ```
 
 ## TO DO
-- Add textbox
+- Update ascii table
+- Make menu shortcut combos work
+- Line counting
+- Syntax highlighting
+- Up and down arrows
+- Scroll bar
