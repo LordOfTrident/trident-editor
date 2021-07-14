@@ -300,10 +300,10 @@ void app::start() {
 
             if (fname != "") {
                 if (fexists(fname)) {
-                    ceditors  .push_back (ceditor (&ioh, fname, ftostr(fname)));
+                    ceditors .push_back (ceditor (&ioh, fname, ftostr(fname)));
                     filemenu .setvsble  (false);
                 } else
-                    filemsg  .settxt    ("File '" + (
+                    filemsg .settxt    ("File '" + (
                             fname.length() > 9? 
                                 fname.substr(0, 9) + "..." 
                             : 
@@ -325,7 +325,7 @@ void app::start() {
                         if (fexists(fname)) {
                             if (sfowagr) {
                                 strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
-                                ceditors[idx_linfcs] .getfrm ()->setttl (fname);
+                                ceditors[idx_linfcs] .setfname (fname);
 
                                 sfilemenu .setvsble (false);
 
@@ -337,7 +337,7 @@ void app::start() {
                             };
                         } else {
                             strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
-                            ceditors[idx_linfcs] .getfrm ()->setttl (fname);
+                            ceditors[idx_linfcs] .setfname (fname);
 
                             sfilemenu .setvsble (false);
                         };

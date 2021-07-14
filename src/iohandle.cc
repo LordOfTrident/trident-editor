@@ -8,7 +8,7 @@ LUIC::iohandle::iohandle(str p_ttl, flags p_flags):
 {
     setlocale (LC_CTYPE, "");
     printf    ("\033]0;%s\007", p_ttl.c_str()); // Title
-    printf    ("\033[?1003h\n");                // Enable Mouse Movement Events
+    //printf    ("\033[?1003h\n");                // Enable Mouse Movement Events
     initscr   ();
     
     noecho    ();
@@ -39,7 +39,7 @@ LUIC::iohandle::iohandle(str p_ttl, flags p_flags):
 LUIC::iohandle::~iohandle() {
     endwin();
 
-    printf("\033[?1003l\n"); // Disable Mouse Movement Events
+    //printf("\033[?1003l\n"); // Disable Mouse Movement Events
 };
 
 void LUIC::iohandle::setflgs(flags p_flags) {

@@ -23,10 +23,16 @@ namespace LUIC {
         void settxt (str p_txt);
         str  gettxt ();
 
+        void setft (str p_ft);
+        str  getft ();
+
     private:
 
-        str  txt;
+        str txt,
+            ft;
+
         bool prsd;
+
         ui16 curpos,
              curx,
              cury,

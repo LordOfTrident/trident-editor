@@ -1,6 +1,6 @@
 #include "topbar.hh"
 
-str getcurdate() {
+str __gcurdt() {
     time_t    now = time(0);
     struct tm tstruct;
     char      buf[80];
@@ -79,7 +79,7 @@ void LUIC::topbar::draw() {
             wnd .setsz (parent->getszx(), 1);
     };
 
-    str date = getcurdate ();
+    str date = __gcurdt ();
 
     wnd .setbgclr (__LUIC__SYSCLR);
     wnd .setattr  (A_BLINK, true);

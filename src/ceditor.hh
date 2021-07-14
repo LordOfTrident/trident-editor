@@ -17,11 +17,13 @@ public:
 
     void cleanup ();
     
-    frame   *getfrm   ();
+    frame  *getfrm   ();
     editor *gettxtbx ();
+
+    void setfname (str p_ttl);
 
 private:
 
-    frame   *frm;
+    frame  *frm;
     editor *txtbx;
 };
