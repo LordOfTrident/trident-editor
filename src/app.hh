@@ -10,6 +10,7 @@
 #include "topbar.hh"
 #include "textbar.hh"
 #include "editor.hh"
+#include "ceditor.hh"
 
 using namespace LUIC;
 
@@ -52,6 +53,6 @@ private:
     frame atblframe;
     label atbllabel;
 
-    vector <editor> editors;
-    i8             idx_linfcs;
+    vector <ceditor> ceditors;
+    i8              idx_linfcs;
 };

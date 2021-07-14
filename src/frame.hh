@@ -22,7 +22,6 @@ namespace LUIC {
         virtual void input (i16 p_in, MEVENT* p_evt);
 
         void setttl   (str p_ttl);
-        void setflags (flags p_flags);
 
         bool lstinfcs ();
 
@@ -35,9 +34,7 @@ namespace LUIC {
               rsz,
               linfcs;
 
-        flags flgs;
-
         ui16 offstx, 
-              offsty;
+             offsty;
     };
 };

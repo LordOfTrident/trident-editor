@@ -18,11 +18,32 @@ void LUIC::component::setparent(component* p_parent) {
         if (posy > parent->getszy () - wnd .getszy () - 1) posy = parent->getszy () - wnd .getszy () - 1;
 
         wnd .setpos (parent->__gttlpsx () + posx, parent->__gttlpsy () + posy);
+
+        if (flgs & LUIC_FLAGS_COMPONENT_SCALED) {
+            setsz  (parent->getszx() - 2, parent->getszy() - 2);
+            setpos (1, 1);
+        };
     };
+};
+
+void LUIC::component::setcolschm(colors p_colorscheme) {
+    colorscheme = p_colorscheme;
+};
+
+colors LUIC::component::getcolschm() {
+    return colorscheme;
 };
 
 void LUIC::component::setioh(iohandle* p_ioh) {
     ioh = p_ioh;
+};
+
+void LUIC::component::setflags(flags p_flags) {
+    flgs = p_flags;
+};
+
+flags LUIC::component::getflags() {
+    return flgs;
 };
 
 void LUIC::component::addchild(component* p_child) {
@@ -81,6 +102,15 @@ ui16 LUIC::component::getposy() {
 
 void LUIC::component::setsz(ui16 p_szx, ui16 p_szy) {
     wnd.setsz(p_szx, p_szy);
+
+    for (i16 i = (i16)children.size() - 1; i >= 0; -- i) {
+        component *child = children[i];
+
+        if (child->getflags () & LUIC_FLAGS_COMPONENT_SCALED) {
+            child->setsz(p_szx - 2, p_szy - 2);
+            child->setpos(1, 1);
+        };
+    };
 };
 
 ui16 LUIC::component::getszx() {
@@ -149,4 +179,8 @@ void LUIC::component::__fxps() {
         children[i]->setpos (children[i]->getposx (), children[i]->getposy ());
         children[i]->__fxps ();
     };
+};
+
+LUIC::window* LUIC::component::__gwndacs() {
+    return &wnd;
 };

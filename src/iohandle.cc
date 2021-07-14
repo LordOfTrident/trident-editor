@@ -104,7 +104,7 @@ void LUIC::iohandle::draw() {
 };
 
 i16 LUIC::iohandle::input() {
-    napms(60);
+    napms(10);
     
     ++ tick;
 
@@ -178,6 +178,7 @@ void LUIC::iohandle::initthm(bool p_shdw) {
     init_pair (__LUIC__BTNPCLR, COLOR_LIGHTWHITE, COLOR_GREEN);
 
     init_pair (__LUIC__WNDGRN, COLOR_LIGHTGREEN, COLOR_WHITE);
+    init_pair (__LUIC__SYSGRN, COLOR_LIGHTGREEN, COLOR_BLUE);
     init_pair (__LUIC__WNDCLR, COLOR_LIGHTBLUE,  COLOR_WHITE);
     init_pair (__LUIC__WNDDEF, COLOR_BLACK,      COLOR_WHITE);
     init_pair (__LUIC__WBACLR, COLOR_LIGHTWHITE, COLOR_WHITE);

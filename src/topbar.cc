@@ -134,7 +134,7 @@ void LUIC::topbar::draw() {
         ownd .setbrdr  (0, 0, ownd.getszx() - 1, ownd.getszy() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
     };
 
-    if (ioh->gettick() % 2 == 0) {
+    if (ioh->gettick() % 8 == 0) {
         ++ walker;
         i32 max = wnd. getszx () - pos - date .length () - ttl .length () - 1;
 
@@ -143,7 +143,7 @@ void LUIC::topbar::draw() {
         if (walker > max) walker = 0;
     };
 
-    if (ioh->gettick() % 4 == 0 && walker_state != -1) {
+    if (ioh->gettick() % 16 == 0 && walker_state != -1) {
         ++ walker_state;
         if (walker_state > 3) walker_state = 0;
     };

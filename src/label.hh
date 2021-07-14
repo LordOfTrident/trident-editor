@@ -12,7 +12,7 @@ namespace LUIC {
     public:
 
         label ();
-        label (str p_txt, ui16 p_posx, ui16 p_posy);
+        label (str p_txt, ui16 p_posx, ui16 p_posy, flags p_flags);
 
         virtual void draw  ();
         virtual void input (i16 p_in, MEVENT* p_evt);

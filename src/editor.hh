@@ -3,22 +3,34 @@
 #include "_COMPONENTS"
 #include "_COLORS"
 #include "types.hh"
+#include "window.hh"
+#include "component.hh"
 #include "iohandle.hh"
-#include "frame.hh"
 
-using namespace LUIC;
+#define LUIC_FLAGS_TXTB_EDITOR   11
+#define LUIC_FLAGS_FRM_RESIZABLE 52
 
-class editor {
-public:
+namespace LUIC {
+    class editor: public component {
+    public:
 
-    editor ();
-    editor (iohandle *p_ioh, str p_ttl, str p_txt);
+        editor ();
+        editor (ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags);
 
-    void cleanup ();
-    
-    frame *getfrm ();
+        virtual void draw  ();
+        virtual void input (i16 p_in, MEVENT* p_evt);
 
-private:
+        void settxt (str p_txt);
+        str  gettxt ();
 
-    frame *frm;
+    private:
+
+        str  txt;
+        bool prsd;
+        ui16 curpos,
+             curx,
+             cury,
+             scrx,
+             scry;
+    };
 };

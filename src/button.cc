@@ -2,13 +2,14 @@
 
 LUIC::button::button() {};
 
-LUIC::button::button(str p_txt, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy):
+LUIC::button::button(str p_txt, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags):
     txt    (p_txt),
     prsd   (false),
     clck   (false),
     linfcs (false)
 {
     type = LUIC_TYPE_BUTTON;
+    flgs = p_flags;
     
     posx = p_posx;
     posy = p_posy;

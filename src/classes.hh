@@ -5,4 +5,5 @@ namespace LUIC {
     class button;
     class topbar;
     class textbar;
+    class textbox;
 };

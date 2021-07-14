@@ -12,7 +12,7 @@ namespace LUIC {
     public:
 
         textbar ();
-        textbar (ui16 p_posx, ui16 p_posy, ui16 p_szx);
+        textbar (ui16 p_posx, ui16 p_posy, ui16 p_szx, flags p_flags);
 
         virtual void draw  ();
         virtual void input (i16 p_in, MEVENT* p_evt);
@@ -22,9 +22,9 @@ namespace LUIC {
 
     private:
 
-        str   txt;
-        bool  prsd;
+        str  txt;
+        bool prsd;
         ui16 curpos,
-              scrx;
+             scrx;
     };
 };

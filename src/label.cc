@@ -2,10 +2,11 @@
 
 LUIC::label::label() {};
 
-LUIC::label::label(str p_txt, ui16 p_posx, ui16 p_posy):
+LUIC::label::label(str p_txt, ui16 p_posx, ui16 p_posy, flags p_flags):
     txt (p_txt)
 {
     type = LUIC_TYPE_LABEL;
+    flgs = p_flags;
     
     posx = p_posx;
     posy = p_posy;

@@ -35,15 +35,21 @@ namespace LUIC {
         void setvsble (bool p_vsble);
         bool getvsble ();
 
-        void  setpos  (i16 p_posx, i16 p_posy);
+        void setpos  (i16 p_posx, i16 p_posy);
         ui16 getposx ();
         ui16 getposy ();
 
-        void  setsz   (ui16 p_szx, ui16 p_szy);
+        void setsz   (ui16 p_szx, ui16 p_szy);
         ui16 getszx  ();
         ui16 getszy  ();
 
-        str   gettype ();
+        void   setcolschm(colors p_colorscheme);
+        colors getcolschm();
+
+        str gettype ();
+
+        void  setflags (flags p_flags);
+        flags getflags ();
 
         void  __sttlps  (ui16 p_posx, ui16 p_posy);
         ui16 __gttlpsx ();
@@ -51,6 +57,8 @@ namespace LUIC {
 
         void __fcsprnts ();
         void __fxps     ();
+
+        window* __gwndacs ();
 
     protected:
 
@@ -63,9 +71,13 @@ namespace LUIC {
         window     wnd;
 
         ui16 posx,
-              posy;
+             posy;
+
+        colors colorscheme;
 
         bool infcs,
              vsble;
+
+        flags flgs;
     };
 };

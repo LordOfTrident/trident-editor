@@ -13,6 +13,7 @@
 #define __LUIC__WNDCLR  250
 #define __LUIC__WNDDEF  249
 #define __LUIC__WNDGRN  245
+#define __LUIC__SYSGRN  207
 #define __LUIC__WBACLR  240
 #define __LUIC__WBBCLR  230
 
@@ -29,16 +30,17 @@
 #define __LUIC__TXTCLR  233
 #define __LUIC__TXTNFCS 232
 
-#define LUIC_FLAGS_IOH_CBREAK     10
-#define LUIC_FLAGS_IOH_NOESCDELAY 23
-#define LUIC_FLAGS_IOH_CLEARSCR   55
+#define LUIC_FLAGS_IOH_CBREAK       10
+#define LUIC_FLAGS_IOH_NOESCDELAY   23
+#define LUIC_FLAGS_IOH_CLEARSCR     55
+#define LUIC_FLAGS_COMPONENT_SCALED 243
 
 #define LUIC_TYPE_FRAME   "frame"
 #define LUIC_TYPE_LABEL   "label"
 #define LUIC_TYPE_BUTTON  "button"
 #define LUIC_TYPE_TOPBAR  "topbar"
 #define LUIC_TYPE_TEXTBAR "textbar"
-#define LUIC_TYPE_TEXTBOX "textbox"
+#define LUIC_TYPE_EDITOR  "editor"
 
 namespace LUIC {
     class iohandle {

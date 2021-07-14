@@ -2,13 +2,14 @@
 
 LUIC::textbar::textbar() {};
 
-LUIC::textbar::textbar(ui16 p_posx, ui16 p_posy, ui16 p_szx):
+LUIC::textbar::textbar(ui16 p_posx, ui16 p_posy, ui16 p_szx, flags p_flags):
     txt    (""),
     prsd   (false),
     curpos (0),
     scrx   (0)
 {
     type = LUIC_TYPE_TEXTBAR;
+    flgs = p_flags;
     
     posx = p_posx;
     posy = p_posy;
