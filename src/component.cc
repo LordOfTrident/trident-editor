@@ -1,8 +1,9 @@
 #include "component.hh"
 
 LUIC::component::component():
-    infcs (false),
-    vsble (true)
+    infcs  (false),
+    vsble  (true),
+    linfcs (false)
 {};
 
 void LUIC::component::setparent(component* p_parent) {
@@ -146,6 +147,10 @@ str LUIC::component::gettype() {
     return type;
 };
 
+bool LUIC::component::lstinfcs() {
+    return linfcs;
+};
+
 LUIC::component* LUIC::component::getparent() {
     return parent;
 };
@@ -170,8 +175,12 @@ void LUIC::component::__fcsprnts() {
     if (parent != NULL) {
         parent->pbchild (this);
         parent->__fcsprnts ();
-    } else 
+    } else {
         ioh->pbchild (this);
+
+        infcs  = true;
+        linfcs = true;
+    };
 };
 
 void LUIC::component::__fxps() {

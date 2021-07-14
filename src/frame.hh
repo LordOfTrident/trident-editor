@@ -21,9 +21,7 @@ namespace LUIC {
         virtual void draw  ();
         virtual void input (i16 p_in, MEVENT* p_evt);
 
-        void setttl   (str p_ttl);
-
-        bool lstinfcs ();
+        void setttl (str p_ttl);
 
     private:
 
@@ -31,8 +29,7 @@ namespace LUIC {
         bool  prsd,
               clse,
               drg,
-              rsz,
-              linfcs;
+              rsz;
 
         ui16 offstx, 
              offsty;

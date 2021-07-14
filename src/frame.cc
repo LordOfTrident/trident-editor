@@ -7,8 +7,7 @@ LUIC::frame::frame(str p_ttl, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, 
     prsd   (false),
     clse   (false),
     drg    (false),
-    rsz    (false),
-    linfcs (false)
+    rsz    (false)
 {
     type = LUIC_TYPE_FRAME;
     flgs = p_flags;
@@ -112,7 +111,8 @@ void LUIC::frame::input(i16 p_in, MEVENT* p_evt) {
                     vsble = false;
                     infcs = false;
                 } else if (rsz) {
-                    rsz = false;
+                    rsz   = false;
+                    infcs = false;
 
                     i16 newszx = p_evt->x - wnd.getposx() + 1, 
                         newszy = p_evt->y - wnd.getposy() + 1;
@@ -120,12 +120,9 @@ void LUIC::frame::input(i16 p_in, MEVENT* p_evt) {
                     if (newszx < 20) newszx = 20;
                     if (newszy < 5)  newszy = 5;
 
-
                     setsz (newszx, newszy);
                 };
             } else if (p_evt->bstate & BUTTON1_PRESSED) {
-                if (ioh->__gchldfcsed()) return;
-
                 if (!(p_evt->x >= wnd .getposx () && 
                       p_evt->y >= wnd .getposy () && 
                     
@@ -135,11 +132,15 @@ void LUIC::frame::input(i16 p_in, MEVENT* p_evt) {
                     
                     break;
                 };
+
+                if (ioh->__gchldfcsed()) return;
+
                 if (flgs & LUIC_FLAGS_FRM_CLOSABLE) {
                     if (p_evt->x == wnd .getszx () + wnd .getposx () - 3 &&
                         p_evt->y == wnd .getposy ()) {
-                        clse  = true;
-                        infcs = true;
+                        clse   = true;
+                        infcs  = true;
+                        linfcs = true;
 
                         break;
                     };
@@ -148,8 +149,9 @@ void LUIC::frame::input(i16 p_in, MEVENT* p_evt) {
                 if (flgs & LUIC_FLAGS_FRM_RESIZABLE) {
                     if (p_evt->x == wnd .getszx () + wnd .getposx () - 1 &&
                         p_evt->y == wnd .getszy () + wnd .getposy () - 1) {
-                        rsz   = true;
-                        infcs = true;
+                        rsz    = true;
+                        infcs  = true;
+                        linfcs = true;
 
                         break;
                     };
@@ -178,8 +180,4 @@ void LUIC::frame::input(i16 p_in, MEVENT* p_evt) {
     if (parent == NULL)
         if (posy < 1)
             setpos (getposx (), 1);
-};
-
-bool LUIC::frame::lstinfcs() {
-    return linfcs;
 };

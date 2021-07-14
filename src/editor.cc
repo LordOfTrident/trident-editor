@@ -6,16 +6,17 @@ LUIC::editor::editor(ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_f
     txt    (""),
     prsd   (false),
     curpos (0),
-    scrx   (0)
+    scrx   (0),
+    scry   (0)
 {
     type = LUIC_TYPE_EDITOR;
     flgs = p_flags | LUIC_FLAGS_COMPONENT_SCALED;
 
     colorscheme = {
         __LUIC__SHDWCLR,
-        __LUIC__SYSCLR,
         __LUIC__TXTCLR,
-        __LUIC__TXTNFCS
+        __LUIC__TXTCLR,
+        __LUIC__SYSCLR
     };
     
     posx = p_posx;
@@ -29,6 +30,7 @@ void LUIC::editor::settxt(str p_txt) {
 
     curpos = 0;
     scrx = 0;
+    scry = 0;
 };
 
 str LUIC::editor::gettxt() {
@@ -40,28 +42,37 @@ void LUIC::editor::draw() {
 
     if (parent == NULL) wnd .drawshdw (colorscheme[0]);
 
-    if (prsd)       wnd .setbgclr (colorscheme[1]);
-    else if (infcs) wnd .setbgclr (colorscheme[2]);
-    else            wnd .setbgclr (colorscheme[3]);
+    if (prsd)       wnd .setbgclr (colorscheme[3]);
+    else            wnd .setbgclr (colorscheme[2]);
 
-    wnd .outat (0, 0, txt.substr(scrx, wnd.getszx() - 2));
-   
-    if (infcs) {
-        wnd .setattr (A_REVERSE, true);
-        wnd .setclr  (colorscheme[1]);
+    ui16 rndrx = 0, rndry = 0;
+    for (ui32 i = 0; i <= (ui32)txt.length(); ++ i) {
+        if (i == curpos && infcs)
+            wnd .setattr (A_REVERSE, true);
+            
+        if (i < txt.length() && txt[i] != 10) {
+            wnd .outat (rndrx, rndry, str(1, txt[i]));
 
-        if (curpos == txt.length())
-            wnd .outat (curpos - scrx, 0, " ");
-        else
-            wnd .outat (curpos - scrx, 0, str(1, txt[curpos]));
-        
-        wnd .setattr (A_REVERSE, false);
+            ++ rndrx;
+        } else {
+            if (i == curpos && infcs)
+                wnd .outat   (rndrx, rndry, " ");
+
+            if (txt[i] == 10) {
+                rndrx = 0;
+
+                ++ rndry;
+            };
+        };
+
+        if (i == curpos && infcs)
+            wnd .setattr (A_REVERSE, false);
     };
 
     //wnd .outatclr (0, getszy() - 1, str(getszx(), ' '), colorscheme[1]);
 
     if (parent != NULL) 
-        parent->__gwndacs ()->outatclr (1, parent->getszy () - 1, str("0:0 | ft: txt | en: ASCII").substr(0, parent->getszx ()), colorscheme[1]);
+        parent->__gwndacs ()->outatclr (1, parent->getszy () - 1, str("0:0 | ft: txt | en: ASCII").substr(0, parent->getszx () - 2), colorscheme[1]);
 };
 
 void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
@@ -95,25 +106,68 @@ void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
             break;
         };
 
-        case 10: {
+        case 27: {
+            if (!infcs) break;
             infcs = false;
 
             break;
         };
 
+        case 10: {
+            if (!infcs) break;
+            txt  .insert(curpos, "\n");
+            curx =       0;
+
+            ++ cury;
+            ++ curpos;
+
+            break;
+        };
+
+        case 9: {
+            if (!infcs) break;
+            txt   .insert(curpos, "    ");
+            curx   +=     4;
+            curpos +=     4;
+
+            break;
+        };
+
         case KEY_BACKSPACE: {
-            if (!infcs)      break;
+            if (!infcs) break;
             if (curpos == 0) break;
 
+            if (txt[curpos - 1] == 10) {
+                ui32 idx = txt.substr(0, curpos - 1).find_last_of(10);
+                if (idx == txt.npos) idx = 0;
+
+                curx = curpos - idx - 2;
+
+                -- cury;
+            } else 
+                -- curx;
+
             txt.erase(curpos - 1, 1);
+
             -- curpos;
 
             break;
         };
 
         case KEY_LEFT: {
-            if (!infcs)      break;
+            if (!infcs) break;
             if (curpos == 0) break;
+
+            if (txt[curpos - 1] == 10) {
+                ui32 idx = txt.substr(0, curpos - 1).find_last_of(10);
+                
+                if (idx == txt.npos) idx = 0;
+
+                curx = curpos - idx - 2;
+
+                -- cury;
+            } else 
+                -- curx;
 
             -- curpos;
 
@@ -121,8 +175,15 @@ void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
         };
 
         case KEY_RIGHT: {
-            if (!infcs)                 break;
+            if (!infcs) break;
             if (curpos == txt.length()) break;
+
+            if (txt[curpos] == 10) {
+                curx = 0;
+
+                ++ cury;
+            } else
+                ++ curx;
 
             ++ curpos;
 
@@ -130,11 +191,15 @@ void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
         };
 
         default: {
-            if (!infcs)                  break;
+            if (!infcs) break;
             if (p_in < 32 || p_in > 126) break;
 
-            txt.insert(curpos, str(1, p_in));
+            str chr =       "";
+                chr += (i8) p_in;
 
+            txt.insert(curpos, chr);
+
+            ++ curx;
             ++ curpos;
 
             break;

@@ -51,6 +51,8 @@ namespace LUIC {
         void  setflags (flags p_flags);
         flags getflags ();
 
+        bool lstinfcs();
+
         void  __sttlps  (ui16 p_posx, ui16 p_posy);
         ui16 __gttlpsx ();
         ui16 __gttlpsy ();
@@ -76,7 +78,8 @@ namespace LUIC {
         colors colorscheme;
 
         bool infcs,
-             vsble;
+             vsble,
+             linfcs;
 
         flags flgs;
     };

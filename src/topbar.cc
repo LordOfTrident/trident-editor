@@ -176,6 +176,7 @@ void LUIC::topbar::input(i16 p_in, MEVENT* p_evt) {
                     for (ui16 i = 0; i < options.size(); ++ i) {
                         if (p_evt->x >= pos && p_evt->x < pos + 2 + (i32)options[i].name.length()) {
                             ovr = i;
+                            subovr = 0;
 
                             break;
                         };

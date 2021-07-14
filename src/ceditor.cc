@@ -22,14 +22,16 @@ ceditor::ceditor(iohandle *p_ioh, str p_ttl, str p_txt) {
         0
     );
 
+    txtbx->settxt (p_txt);
+
     frm->addchild (txtbx);
-    frm->setcolschm({
+    frm->setcolschm ({
         __LUIC__SHDWCLR,
+        __LUIC__TXTCLR,
+        __LUIC__TXTCLR,
+        __LUIC__BCKGRN,
         __LUIC__SYSCLR,
-        __LUIC__SYSCLR,
-        __LUIC__SYSGRN,
-        __LUIC__SYSGRN,
-        __LUIC__SYSCLR
+        __LUIC__TXTCLR
     });
 };
 

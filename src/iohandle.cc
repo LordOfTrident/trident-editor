@@ -13,6 +13,7 @@ LUIC::iohandle::iohandle(str p_ttl, flags p_flags):
     
     noecho    ();
     cbreak    ();
+    raw       ();
     timeout   (-1);
     nodelay   (stdscr, true);
     keypad    (stdscr, true);
@@ -179,6 +180,7 @@ void LUIC::iohandle::initthm(bool p_shdw) {
 
     init_pair (__LUIC__WNDGRN, COLOR_LIGHTGREEN, COLOR_WHITE);
     init_pair (__LUIC__SYSGRN, COLOR_LIGHTGREEN, COLOR_BLUE);
+    init_pair (__LUIC__BCKGRN, COLOR_LIGHTGREEN, COLOR_BLACK);
     init_pair (__LUIC__WNDCLR, COLOR_LIGHTBLUE,  COLOR_WHITE);
     init_pair (__LUIC__WNDDEF, COLOR_BLACK,      COLOR_WHITE);
     init_pair (__LUIC__WBACLR, COLOR_LIGHTWHITE, COLOR_WHITE);

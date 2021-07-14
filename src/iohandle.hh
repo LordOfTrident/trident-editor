@@ -14,6 +14,7 @@
 #define __LUIC__WNDDEF  249
 #define __LUIC__WNDGRN  245
 #define __LUIC__SYSGRN  207
+#define __LUIC__BCKGRN  208
 #define __LUIC__WBACLR  240
 #define __LUIC__WBBCLR  230
 
