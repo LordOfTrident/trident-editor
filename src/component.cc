@@ -3,7 +3,8 @@
 LUIC::component::component():
     infcs  (false),
     vsble  (true),
-    linfcs (false)
+    linfcs (false),
+    inset  (true)
 {};
 
 void LUIC::component::setparent(component* p_parent) {
@@ -81,16 +82,24 @@ void LUIC::component::setpos(i16 p_posx, i16 p_posy) {
     if (parent == NULL)
         wnd .setpos (posx, posy);
     else {
-        if (posx < 1) posx = 1;
-        if (posy < 1) posy = 1;
+        if (posx < inset) posx = inset;
+        if (posy < inset) posy = inset;
 
-        if (posx > parent->getszx () - wnd .getszx () - 1) posx = parent->getszx () - wnd .getszx () - 1;
-        if (posy > parent->getszy () - wnd .getszy () - 1) posy = parent->getszy () - wnd .getszy () - 1;
+        if (posx > parent->getszx () - wnd .getszx () - inset) posx = parent->getszx () - wnd .getszx () - inset;
+        if (posy > parent->getszy () - wnd .getszy () - inset) posy = parent->getszy () - wnd .getszy () - inset;
 
         wnd .setpos (parent->__gttlpsx () + posx, parent->__gttlpsy () + posy);
     };
 
     __fxps ();
+};
+
+void LUIC::component::setinset(bool p_on) {
+    inset = p_on;
+};
+
+bool LUIC::component::getinset() {
+    return inset;
 };
 
 ui16 LUIC::component::getposx() {

@@ -2,13 +2,11 @@
 
 #include "_COMPONENTS"
 #include "_COLORS"
+#include "_FLAGS"
 #include "types.hh"
 #include "window.hh"
 #include "component.hh"
 #include "iohandle.hh"
-
-#define LUIC_FLAGS_TXTB_EDITOR   11
-#define LUIC_FLAGS_FRM_RESIZABLE 52
 
 namespace LUIC {
     class editor: public component {

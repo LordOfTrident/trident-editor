@@ -208,37 +208,65 @@ app::app(i32 argc, ch* argv[]) {
         "ASCII Table",
         ioh.getwsizex() / 2 - 25,
         ioh.getwsizey() / 2 - 11,
-        50,
-        22,
+        32,
+        8,
         LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
     );
 
     atblframe .setvsble (false);
     ioh .addchild (&atblframe);
 
-    str tbl = "";
-    i16 strl = 0;
-    for (ch i = 0; (ui8)i < 128; ++ i) {
-        str toadd = "";
-        toadd += str(3 - std::to_string(i).length(), ' ');
-        toadd += std::to_string(i) + ": ";
-        toadd += (i < 32 || i > 126? " " : str(1, i));
-        toadd += "|";
+    ui8 posx = 0, posy = 0;
+    for (ui8 i = 0; i < 128; ++ i) {
+        if (i % 32 == 0) {
+            posx = 0;
 
-        strl += toadd.length();
-
-        if ((i32)toadd.length() + strl > atblframe.getszx() - 4) {
-            strl = 0; 
-            tbl  += '\n';
+            ++ posy;
         };
 
-        tbl += toadd;
+        button* btn = new button(
+            i < 32 || i > 126? " " : str(1, i),
+            1 + posx,
+            posy,
+            1,
+            1,
+            0
+        );
+
+        btn->setcolschm ({
+            __LUIC__SHDWCLR,
+            __LUIC__WNDCLR,
+            __LUIC__SYSCLR,
+            __LUIC__WBACLR,
+            __LUIC__WBBCLR,
+            __LUIC__TXTCLR,
+            __LUIC__COMMON
+        });
+
+        atblbtns  .push_back (btn);
+        atblframe .addchild  (btn);
+
+        ++ posx;
     };
 
+    atblline = label (
+        str(30, ACS_HLINE),
+        1,
+        5,
+        LUIC_FLAGS_LBL_ALTCHARSET
+    );
+
+    atblline .setcolschm ({
+        __LUIC__WBACLR,
+        __LUIC__SHDWCLR
+    });
+
+    atblframe .addchild (&atblline);
+
     atbllabel = label(
-        tbl,
-        1,
-        1,
+        "CH: - | CNTRL: - | DEC: -",
+        2,
+        6,
         0
     );
 
@@ -350,6 +378,17 @@ void app::start() {
         } else if (crdtsok.isclicked())
             crdtsframe .setvsble (false);
 
+        atbllabel .settxt ("CH: - | CNTRL: - | DEC: -");
+        for (ui8 i = 0; i < (ui8)atblbtns.size(); ++ i) {
+            button* btn = (button*)atblbtns[i];
+
+            if (btn->lstinfcs()) {
+                atbllabel .settxt ("CH: " + (i < 32 || i > 126? "-" : str(1, i)) + " | CNTRL: " + (i < 32 || i > 126? "Y" : "N") + " | DEC: " + std::to_string(i));
+
+                break;
+            };
+        };
+
         for (i16 i = 0; i < (i16)ceditors.size(); ++ i) {
             if (!ceditors[i].getfrm()->getvsble()) {
                 ceditors[i] .cleanup ();
@@ -370,5 +409,9 @@ void app::start() {
 
     for (i16 i = 0; i < (i16)ceditors.size(); ++ i) {
         ceditors[i] .cleanup ();
+    };
+
+    for (ui8 i = 0; i < (ui8)atblbtns.size(); ++ i) {
+        delete (button*)atblbtns[i];
     };
 };

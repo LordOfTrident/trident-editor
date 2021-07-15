@@ -86,7 +86,7 @@ void LUIC::editor::draw() {
         };
 
         if (i < ftxt.length() && ftxt[i] != 10) {
-            if (ftxt[i] > 31 && ftxt[i] < 127) wnd .outat (rndrx, rndry, str(1, ftxt[i]));
+            wnd .outat (rndrx, rndry, ftxt[i] > 31 && ftxt[i] < 127? str(1, ftxt[i]) : " ");
 
             ++ rndrx;
         } else {

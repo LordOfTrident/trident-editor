@@ -7,6 +7,10 @@ LUIC::label::label(str p_txt, ui16 p_posx, ui16 p_posy, flags p_flags):
 {
     type = LUIC_TYPE_LABEL;
     flgs = p_flags;
+    colorscheme = {
+        __LUIC__COMMON,
+        __LUIC__SHDWCLR
+    };
     
     posx = p_posx;
     posy = p_posy;
@@ -19,13 +23,13 @@ LUIC::label::label(str p_txt, ui16 p_posx, ui16 p_posy, flags p_flags):
         if (txt[i] == 10) {
             ++ szy;
 
-            if (szx < i - pos + 1) szx = i - pos + 1;
+            if (szx < i - pos + 1) szx = i - pos;
 
             pos = i;
         };
     };
 
-    if (szx < txt.length() - pos + 1) szx = txt.length() - pos + 1;
+    if (szx < txt.length() - pos + 1) szx = txt.length() - pos;
 
     wnd = window (posx, posy, szx, szy);
 };
@@ -42,13 +46,13 @@ void LUIC::label::settxt(str p_txt) {
         if (txt[i] == 10) {
             ++ szy;
 
-            if (szx < i - pos + 1) szx = i - pos + 1;
+            if (szx < i - pos + 1) szx = i - pos;
 
             pos = i;
         };
     };
 
-    if (szx < txt.length() - pos + 1) szx = txt.length() - pos + 1;
+    if (szx < txt.length() - pos + 1) szx = txt.length() - pos;
 
     wnd .setsz (szx, szy);
 };
@@ -56,11 +60,22 @@ void LUIC::label::settxt(str p_txt) {
 void LUIC::label::draw() {
     if (ioh == NULL || !vsble) return;
 
-    if (parent == NULL) wnd .drawshdw (__LUIC__SHDWCLR);
+    if (parent == NULL) wnd .drawshdw (colorscheme[1]);
 
-    wnd .setbgclr (__LUIC__WNDDEF);
+    wnd .setbgclr (colorscheme[0]);
 
-    wnd .outat (0, 0, txt.c_str());
+    bool altcharset = false;
+    
+    if (flgs & LUIC_FLAGS_LBL_ALTCHARSET) {
+        altcharset = true;
+
+        wnd .setattr (A_ALTCHARSET, true);
+    };
+    
+    wnd .outat (0, 0, txt);
+    
+    if (altcharset)
+        wnd .setattr (A_ALTCHARSET, false);
 };
 
 void LUIC::label::input(i16 p_in, MEVENT* p_evt) {};

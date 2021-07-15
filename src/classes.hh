@@ -1,3 +1,5 @@
+#pragma once
+
 namespace LUIC {
     class iohandle;
     class component;

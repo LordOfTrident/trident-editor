@@ -2,6 +2,7 @@
 
 #include "_COMPONENTS"
 #include "_COLORS"
+#include "_FLAGS"
 #include "types.hh"
 #include "window.hh"
 #include "component.hh"

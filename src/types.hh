@@ -19,5 +19,5 @@ typedef wchar_t      wch;
 typedef cchar_t      cch;
 
 typedef ui8          color;
-typedef ui8          flags;
+typedef ui16         flags;
 typedef vector <ui8> colors;

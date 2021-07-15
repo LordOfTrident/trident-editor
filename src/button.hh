@@ -24,7 +24,6 @@ namespace LUIC {
 
         str   txt;
         bool  prsd,
-              clck,
-              linfcs;
+              clck;
     };
 };

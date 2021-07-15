@@ -146,8 +146,7 @@ void LUIC::window::setclr(color p_clr) {
 };
 
 void LUIC::window::setattr(i32 p_attr, bool p_on) {
-    if (p_on) screen::lastattr = p_attr;
-    else      screen::lastattr = 0;
+    screen::lastattr = p_on? p_attr : 0;
 };
 
 void LUIC::window::drawshdw(color p_clr) {

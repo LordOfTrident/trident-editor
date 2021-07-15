@@ -2,6 +2,7 @@
 
 #include "_COMPONENTS"
 #include "_COLORS"
+#include "_FLAGS"
 #include "types.hh"
 #include "window.hh"
 #include "classes.hh"
@@ -51,7 +52,10 @@ namespace LUIC {
         void  setflags (flags p_flags);
         flags getflags ();
 
-        bool lstinfcs();
+        bool lstinfcs ();
+        
+        void setinset (bool p_on);
+        bool getinset ();
 
         void  __sttlps  (ui16 p_posx, ui16 p_posy);
         ui16 __gttlpsx ();
@@ -79,7 +83,8 @@ namespace LUIC {
 
         bool infcs,
              vsble,
-             linfcs;
+             linfcs,
+             inset;
 
         flags flgs;
     };

@@ -5,11 +5,19 @@ LUIC::button::button() {};
 LUIC::button::button(str p_txt, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags):
     txt    (p_txt),
     prsd   (false),
-    clck   (false),
-    linfcs (false)
+    clck   (false)
 {
     type = LUIC_TYPE_BUTTON;
     flgs = p_flags;
+    colorscheme = {
+        __LUIC__SHDWCLR,
+        __LUIC__WNDCLR,
+        __LUIC__SYSCLR,
+        __LUIC__WBACLR,
+        __LUIC__WBBCLR,
+        __LUIC__BTNPCLR,
+        __LUIC__HGHLGHT
+    };
     
     posx = p_posx;
     posy = p_posy;
@@ -32,28 +40,29 @@ bool LUIC::button::isclicked() {
 void LUIC::button::draw() {
     if (ioh == NULL || !vsble) return;
 
-    if (parent == NULL) wnd .drawshdw (__LUIC__SHDWCLR);
+    if (parent == NULL) wnd .drawshdw (colorscheme[0]);
 
+    
     if (wnd.getszy() > 2) {
-        wnd .setbgclr (__LUIC__WNDCLR);
+        wnd .setbgclr (colorscheme[1]);
 
         if (prsd)
-            wnd .setdbbrdr (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
+            wnd .setdbbrdr (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[3], colorscheme[4]);
         else 
-            wnd .setbrdr   (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
+            wnd .setbrdr   (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[3], colorscheme[4]);
 
         if (linfcs)
-            wnd .setclr (__LUIC__SYSCLR);
+            wnd .setclr (colorscheme[2]);
 
         wnd .outat (1, wnd.getszy() / 2, str(wnd.getszx() - 2, ' '));
         wnd .outat (wnd.getszx() / 2 - txt.length() / 2, wnd.getszy() / 2, txt);
     } else {
         if (prsd)
-            wnd .setbgclr (__LUIC__SYSCLR);
+            wnd .setbgclr (colorscheme[2]);
         else if (linfcs)
-            wnd .setbgclr (__LUIC__BTNPCLR);
+            wnd .setbgclr (colorscheme[5]);
         else 
-            wnd .setbgclr (__LUIC__HGHLGHT);
+            wnd .setbgclr (colorscheme[6]);
 
         wnd .outat (wnd.getszx() / 2 - txt.length() / 2, wnd.getszy() / 2, txt);
     };

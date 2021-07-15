@@ -2,6 +2,7 @@
 
 #include "_COMPONENTS"
 #include "_COLORS"
+#include "_FLAGS"
 #include "types.hh"
 #include "window.hh"
 #include "classes.hh"
@@ -30,11 +31,6 @@
 #define __LUIC__COMMON  200
 #define __LUIC__TXTCLR  233
 #define __LUIC__TXTNFCS 232
-
-#define LUIC_FLAGS_IOH_CBREAK       10
-#define LUIC_FLAGS_IOH_NOESCDELAY   23
-#define LUIC_FLAGS_IOH_CLEARSCR     55
-#define LUIC_FLAGS_COMPONENT_SCALED 243
 
 #define LUIC_TYPE_FRAME   "frame"
 #define LUIC_TYPE_LABEL   "label"

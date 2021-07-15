@@ -51,7 +51,9 @@ private:
     button crdtsok;
 
     frame atblframe;
-    label atbllabel;
+    label atbllabel,
+          atblline;
+    vector <component*> atblbtns;
 
     vector <ceditor> ceditors;
     i8              idx_linfcs;

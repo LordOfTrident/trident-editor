@@ -11,7 +11,6 @@ tred
 ```
 
 ## TO DO
-- Update ascii table
 - Make menu shortcut combos work
 - Line counting
 - Syntax highlighting
