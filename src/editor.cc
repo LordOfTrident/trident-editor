@@ -25,12 +25,12 @@ LUIC::editor::editor() {};
 LUIC::editor::editor(ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags):
     txt    (""),
     prsd   (false),
+    modif  (false),
     curpos (0),
     curx   (0),
     cury   (0),
     scrx   (0),
-    scry   (0),
-    modif  (false)
+    scry   (0)
 {
     type = LUIC_TYPE_EDITOR;
     flgs = p_flags | LUIC_FLAGS_COMPONENT_SCALED;
@@ -124,7 +124,7 @@ void LUIC::editor::draw() {
     //wnd .outatclr (0, getszy() - 1, str(getszx(), ' '), colorscheme[1]);
 
     if (parent != NULL) {
-        parent->__gwndacs ()->outatclr (1, parent->getszy () - 1, str("0:0 | Mem: " + std::to_string(txt.length()) + "B | ft: " + ft + " | en: ASCII").substr(0, parent->getszx () - 2), colorscheme[1]);
+        parent->__gwndacs ()->outatclr (1, parent->getszy () - 1, str(std::to_string(cury) + ":" + std::to_string(curx) + " | Mem: " + std::to_string(txt.length()) + "B | ft: " + ft + " | en: ASCII").substr(0, parent->getszx () - 2), colorscheme[1]);
 
         if (modif) {
             str fttl = (i32) ttl.length() > (parent->getszx() - 8)? ttl.substr(0, parent->getszx() - 7) : ttl;

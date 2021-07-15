@@ -211,7 +211,7 @@ app::app(i32 argc, ch* argv[]) {
         "ASCII Table",
         ioh.getwsizex() / 2 - 25,
         ioh.getwsizey() / 2 - 11,
-        32,
+        34,
         8,
         LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
     );
@@ -277,6 +277,13 @@ app::app(i32 argc, ch* argv[]) {
 
     idx_linfcs = -1;
     sfowagr    = false;
+
+    for (ui8 i = 1; i < argc; ++ i) {
+        if (fexists(argv[i])) {
+            ceditors .push_back (ceditor (&ioh, argv[i], ftostr(argv[i])));
+            filemenu .setvsble  (false);
+        };
+    };
 
     erase ();
 };
