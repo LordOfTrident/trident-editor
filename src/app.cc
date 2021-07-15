@@ -29,7 +29,7 @@ void app::strtof(str p_txt, str p_fname) {
 app::app(i32 argc, ch* argv[]) {
     ioh = iohandle (
         "Trident Editor", 
-        LUIC_FLAGS_IOH_CBREAK | LUIC_FLAGS_IOH_NOESCDELAY | LUIC_FLAGS_IOH_CLEARSCR
+        LUIC_FLAGS_IOH_NOESCDELAY | LUIC_FLAGS_IOH_CLEARSCR
     );
 
     ioh .initthm (true);
@@ -43,19 +43,22 @@ app::app(i32 argc, ch* argv[]) {
                 suboption("New",     "CTRL+N"), 
                 suboption("Load",    "CTRL+L"), 
                 suboption("Save",    "CTRL+S"),
-                suboption("Save As", ""), 
-                suboption("Exit",    "CTRL+C")
+                suboption("Save As", ""),
+                suboption("Exit",    "CTRL+Q")
             }),
 
             option ("Edit", {
-                suboption("Copy",  "CTRL+K"), 
+                suboption("Copy",  "CTRL+C"), 
                 suboption("Cut",   "CTRL+X"),
                 suboption("Paste", "CTRL+V")
             }),
 
+            option ("Tools", {
+                suboption("ASCII Table", "CTRL+A")
+            }),
+
             option ("Help", {
-                suboption("ASCII Table", ""),
-                suboption("About", "CTRL+A"),
+                suboption("About", ""),
                 suboption("Credits", "")
             })
         }
@@ -288,29 +291,48 @@ void app::start() {
         if (menubar.getsboptst(0) == 4) 
             running = false;
         else if (menubar.getsboptst(0) == 1) {
-            filemsg  .settxt   ("Type in the file name");
-            filename .settxt   ("");
+            filemsg  .settxt ("Type in the file name");
+            filename .settxt ("");
 
-            filemenu .setpos   (ioh.getwsizex() / 2 - filemenu.getszx() / 2, ioh.getwsizey() / 2 - filemenu.getszy() / 2);
-            filemenu .totop    ();
+            filemenu .setpos (ioh.getwsizex() / 2 - filemenu.getszx() / 2, ioh.getwsizey() / 2 - filemenu.getszy() / 2);
+            filemenu .totop  ();
 
             filemenu .setvsble (true);
         } else if (menubar.getsboptst(0) == 3) {
             sfowagr = false;
 
-            sfilemsg  .settxt   ("Type in the file name");
-            sfilename .settxt   ("");
+            sfilemsg  .settxt ("Type in the file name");
+            sfilename .settxt ("");
 
-            sfilemenu .setpos   (ioh.getwsizex() / 2 - sfilemenu.getszx() / 2, ioh.getwsizey() / 2 - sfilemenu.getszy() / 2);
-            sfilemenu .totop    ();
+            sfilemenu .setpos (ioh.getwsizex() / 2 - sfilemenu.getszx() / 2, ioh.getwsizey() / 2 - sfilemenu.getszy() / 2);
+            sfilemenu .totop  ();
 
             sfilemenu .setvsble (true);
+        } else if (menubar.getsboptst(0) == 2) {
+            if (idx_linfcs != -1) {
+                str fname = ceditors[idx_linfcs].getfname();
+
+                if (fexists(fname)) {
+                    strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
+                    ceditors[idx_linfcs] .gettxtbx () ->setmodif (false);
+                } else {
+                    sfowagr = false;
+
+                    sfilemsg  .settxt ("Type in the file name");
+                    sfilename .settxt ("");
+
+                    sfilemenu .setpos (ioh.getwsizex() / 2 - sfilemenu.getszx() / 2, ioh.getwsizey() / 2 - sfilemenu.getszy() / 2);
+                    sfilemenu .totop  ();
+
+                    sfilemenu .setvsble (true);
+                };
+            };
         } else if (menubar.getsboptst(2) == 0) {
             atblframe .setpos   (ioh.getwsizex() / 2 - atblframe.getszx() / 2, ioh.getwsizey() / 2 - atblframe.getszy() / 2);
             atblframe .totop    ();
 
             atblframe .setvsble (true);
-        } else if (menubar.getsboptst(2) == 2) {
+        } else if (menubar.getsboptst(3) == 1) {
             crdtsframe .setpos   (ioh.getwsizex() / 2 - crdtsframe.getszx() / 2, ioh.getwsizey() / 2 - crdtsframe.getszy() / 2);
             crdtsframe .totop    ();
             
@@ -319,6 +341,9 @@ void app::start() {
             ceditors.push_back (ceditor (&ioh, "Untitled", ""));
 
             idx_linfcs = ceditors.size() - 1;
+
+            ceditors[idx_linfcs] .getfrm   ()->setfcs (true);
+            ceditors[idx_linfcs] .gettxtbx ()->setfcs (true);
         } else if (fileclose.isclicked())
             filemenu .setvsble (false);
         else if (sfileclose.isclicked())
@@ -353,6 +378,8 @@ void app::start() {
                         if (fexists(fname)) {
                             if (sfowagr) {
                                 strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
+                                ceditors[idx_linfcs] .gettxtbx () ->setmodif (false);
+
                                 ceditors[idx_linfcs] .setfname (fname);
 
                                 sfilemenu .setvsble (false);
@@ -365,6 +392,7 @@ void app::start() {
                             };
                         } else {
                             strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
+                            ceditors[idx_linfcs] .gettxtbx () ->setmodif (false);
                             ceditors[idx_linfcs] .setfname (fname);
 
                             sfilemenu .setvsble (false);

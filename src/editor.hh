@@ -24,12 +24,20 @@ namespace LUIC {
         void setft (str p_ft);
         str  getft ();
 
+        void setmodif (bool p_m);
+        bool getmodif ();
+
+        void setttl (str p_ttl);
+        str  getttl ();
+
     private:
 
         str txt,
-            ft;
+            ft,
+            ttl;
 
-        bool prsd;
+        bool prsd,
+             modif;
 
         ui16 curpos,
              curx,

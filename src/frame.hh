@@ -19,6 +19,7 @@ namespace LUIC {
         virtual void input (i16 p_in, MEVENT* p_evt);
 
         void setttl (str p_ttl);
+        str  getttl ();
 
     private:
 

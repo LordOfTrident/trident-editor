@@ -44,7 +44,8 @@ ceditor::ceditor(iohandle *p_ioh, str p_ttl, str p_txt) {
 };
 
 void ceditor::setfname(str p_ttl) {
-    frm->setttl (p_ttl);
+    frm->setttl  (p_ttl);
+    txtbx->setttl (p_ttl);
 
     str ft = "txt";
 
@@ -72,7 +73,11 @@ void ceditor::setfname(str p_ttl) {
     else if (__endsw(p_ttl, ".css")) ft = "css";
     else if (__endsw(p_ttl, ".html")) ft = "html";
  
-    txtbx->setft(ft);
+    txtbx->setft (ft);
+};
+
+str ceditor::getfname() {
+    return txtbx->getttl ();
 };
 
 void ceditor::cleanup () {

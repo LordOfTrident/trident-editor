@@ -31,6 +31,10 @@ void LUIC::frame::setttl(str p_ttl) {
     ttl = " " + p_ttl + " ";
 };
 
+str LUIC::frame::getttl() {
+    return ttl.substr(1, ttl.length() - 2);
+};
+
 void LUIC::frame::draw() {
     if (ioh == NULL || !vsble) return;
 
@@ -41,7 +45,7 @@ void LUIC::frame::draw() {
     if (prsd) wnd .setdbbrdr (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[1], colorscheme[2]);
     else      wnd .setbrdr   (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[1], colorscheme[2]);
 
-    str fttl = (i32)ttl.length() > (wnd .getszx() - 13)? ttl.substr(0, 13) : ttl;
+    str fttl = (i32)ttl.length() > (wnd .getszx() - 8)? ttl.substr(0, wnd .getszx() - 11) + "... " : ttl;
     wnd .outat (wnd.getszx() / 2 - fttl.length() / 2, 0, fttl);
 
     if (flgs & LUIC_FLAGS_FRM_CLOSABLE) {

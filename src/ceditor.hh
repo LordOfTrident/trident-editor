@@ -21,6 +21,7 @@ public:
     editor *gettxtbx ();
 
     void setfname (str p_ttl);
+    str  getfname ();
 
 private:
 

@@ -14,8 +14,9 @@ tred
 ```
 
 ## TO DO
-- Make menu shortcut combos work
-- Line counting
-- Syntax highlighting
 - Up and down arrows
+- Selection
+- Copy/Cut/Paste
+- Syntax highlighting
+- Line counting
 - Scroll bar

@@ -1,5 +1,7 @@
 #include "topbar.hh"
 
+#define CTRL(key) ((key) & 0x1f)
+
 str __gcurdt() {
     time_t    now = time(0);
     struct tm tstruct;
@@ -297,6 +299,27 @@ void LUIC::topbar::input(i16 p_in, MEVENT* p_evt) {
             chc    = ovr;
             subchc = subovr;
             infcs  = false;
+
+            break;
+        };
+
+        default: {
+            for (ui16 i = 0; i < options.size(); ++ i) {
+                for (ui16 j = 0; j < options[i].subopts.size(); ++ j) {
+                    str keybind = options[i].subopts[j].keybind;
+                    if (keybind.length() >= 6 && keybind.substr(0, 5) == "CTRL+") {
+                        if (p_in == CTRL(keybind[5])) {
+                            ovr    = i;
+                            subovr = j;
+                            
+                            chc    = ovr;
+                            subchc = subovr;
+
+                            break;
+                        };
+                    };
+                };
+            };
 
             break;
         };

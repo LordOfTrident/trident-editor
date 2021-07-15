@@ -11,9 +11,8 @@ LUIC::iohandle::iohandle(str p_ttl, flags p_flags):
     //printf    ("\033[?1003h\n");                // Enable Mouse Movement Events
     initscr   ();
     
-    noecho    ();
-    cbreak    ();
     raw       ();
+    noecho    ();
     timeout   (-1);
     nodelay   (stdscr, true);
     keypad    (stdscr, true);
