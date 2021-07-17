@@ -128,7 +128,7 @@ void LUIC::editor::draw() {
 
         if (modif) {
             str fttl = (i32) ttl.length() > (parent->getszx() - 8)? ttl.substr(0, parent->getszx() - 7) : ttl;
-            parent->__gwndacs ()->outat (wnd.getszx() / 2 - fttl.length() / 2 + 1, 0, "*");
+            parent->__gwndacs ()->outatclr (wnd.getszx() / 2 - fttl.length() / 2 + 1, 0, "*", colorscheme[1]);
         };
     };
 };

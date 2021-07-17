@@ -8,11 +8,11 @@ printf "\e[0;36m* CMPL: \e[0;33mChecking if required libraries are installed\n\e
 sudo apt-get install libncurses5-dev libncursesw5-dev;
 printf "\e[0;36m* CMPL: \e[0;33mCompiling...\n\e[0m";
 
-if g++ -g src/*.cc -o bin/tred -O3 -s -Wall -std=c++17 -lncursesw; then
+if g++ -g src/*.cc -o bin/tr-ed -O3 -s -Wall -std=c++17 -lncursesw; then
     printf "\e[0;36m* CMPL: \e[0;32mCompiled Succesfully\n";
 
-    printf "\e[0;36m* CMPL: \e[0;33mCopying binary "tred" to /usr/bin...\n\e[0m";
-    sudo cp ./bin/tred /usr/bin/
+    printf "\e[0;36m* CMPL: \e[0;33mCopying binary "tr-ed" to /usr/bin...\n\e[0m";
+    sudo cp ./bin/tr-ed /usr/bin/
     printf "\e[0;36m* CMPL: \e[0;32mDone.\n";
 else
     printf "\e[0;36m* CMPL: \e[0;31mCompilation Failed\n";

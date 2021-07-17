@@ -11,6 +11,7 @@
 #include "textbar.hh"
 #include "editor.hh"
 #include "ceditor.hh"
+#include "scbl.hh"
 
 using namespace LUIC;
 
@@ -24,11 +25,17 @@ public:
 
 private:
 
-    bool fexists(str p_name);
-    str  ftostr(str p_fname);
-    void strtof(str p_txt, str p_fname);
+    bool dexists (str p_name);
+    void maked   (str p_name);
 
-    bool     running;
+    bool fexists (str p_name);
+    str  ftostr  (str p_fname);
+    void strtof  (str p_txt, str p_fname);
+
+    bool running;
+    i8   scblok;
+
+    str homedir;
 
     iohandle ioh;
     topbar   menubar;
@@ -54,6 +61,9 @@ private:
     label atbllabel,
           atblline;
     vector <component*> atblbtns;
+
+    frame scblframe;
+    label scblmsg;
 
     vector <ceditor> ceditors;
     i8              idx_linfcs;
