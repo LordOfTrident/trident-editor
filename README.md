@@ -57,7 +57,6 @@ The next parameter will be the color. List of colors:
 > Example: `set color background black`
 
 ## To do
-- Up and down arrows
 - Selection
 - Copy/Cut/Paste
 - Syntax highlighting
