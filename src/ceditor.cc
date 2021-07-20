@@ -11,8 +11,8 @@ bool __endsw(str p_str, str p_sub) {
 
 ceditor::ceditor() {};
 
-ceditor::ceditor(iohandle *p_ioh, str p_ttl, str p_txt) {
-    frm = new frame (
+ceditor::ceditor(LUIC::iohandle *p_ioh, str p_ttl, str p_txt) {
+    frm = new LUIC::frame (
         p_ttl, 
         0, 
         1, 
@@ -23,7 +23,7 @@ ceditor::ceditor(iohandle *p_ioh, str p_ttl, str p_txt) {
 
     p_ioh->addchild (frm);
 
-    txtbx = new editor(
+    txtbx = new LUIC::editor(
         1,
         1,
         20,
@@ -92,7 +92,7 @@ void ceditor::cleanup () {
     if (frm != NULL) {
         frm->remchild(frm->getchild(txtbx));
 
-        iohandle* ioh = frm->getioh();
+        LUIC::iohandle* ioh = frm->getioh();
         ioh->remchild(ioh->getchild(frm));
 
         delete txtbx;
@@ -100,10 +100,10 @@ void ceditor::cleanup () {
     };
 };
 
-frame *ceditor::getfrm() {
+LUIC::frame *ceditor::getfrm() {
     return frm;
 };
 
-editor *ceditor::gettxtbx() {
+LUIC::editor *ceditor::gettxtbx() {
     return txtbx;
 };

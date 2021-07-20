@@ -204,37 +204,6 @@ void LUIC::topbar::input(i16 p_in, MEVENT* p_evt) {
                         };
                     };
                 } else infcs = false;
-
-                /*if (!(p_evt->x >= wnd .getposx () && 
-                      p_evt->y >= wnd .getposy () && 
-                    
-                      p_evt->x < wnd .getszx () + wnd .getposx () && 
-                      p_evt->y < wnd .getszy () + wnd .getposy ()))
-                    break;
-                
-                if (flgs & LUIC_FLAGS_FRM_CLOSABLE) {
-                    if (p_evt->x == wnd .getszx () + wnd .getposx () - 3 &&
-                        p_evt->y == wnd .getposy ()) {
-                        clse = true;
-                        infcs = true;
-
-                        break;
-                    };
-                };
-                
-                prsd  = true;
-                infcs = false;
-
-                ioh->__schldfcsed (true);
-                __fcsprnts ();
-
-                if (flgs & LUIC_FLAGS_FRM_DRAGGABLE) {
-                    offstx = p_evt->x - wnd .getposx ();
-                    offsty = p_evt->y - wnd .getposy ();
-                };
-
-                if (parent == NULL) ioh->pbchild(this);
-                else parent->pbchild(this);*/
             };
 
             break;

@@ -189,46 +189,6 @@ void LUIC::iohandle::initthm(bool p_shdw) {
 
     init_pair (__LUIC__TXTCLR,  COLOR_WHITE, COLOR_BLACK);
     init_pair (__LUIC__TXTNFCS, COLOR_GREY,  COLOR_BLACK);
-
-    /* SYSTEM Theme
-    init_pair (__LUIC__BCKCLR,  COLOR_WHITE, COLOR_GREY);
-    init_pair (__LUIC__SHDWCLR, COLOR_GREY,  COLOR_BLACK);
-
-    init_pair (__LUIC__WNDGRN, COLOR_LIGHTGREEN, COLOR_LIGHTBLUE);
-    init_pair (__LUIC__WNDCLR, COLOR_LIGHTWHITE, COLOR_LIGHTBLUE);
-    init_pair (__LUIC__WBACLR, COLOR_LIGHTWHITE, COLOR_LIGHTBLUE);
-    init_pair (__LUIC__WBBCLR, COLOR_LIGHTWHITE, COLOR_LIGHTBLUE);
-    */
-
-    /* BLUE Theme
-    init_pair (__LUIC__BCKCLR,  COLOR_WHITE, COLOR_GREY);
-    init_pair (__LUIC__SHDWCLR, COLOR_GREY,  COLOR_BLACK);
-
-    init_pair (__LUIC__WNDGRN, COLOR_LIGHTGREEN,  COLOR_BLUE);
-    init_pair (__LUIC__WNDCLR, COLOR_LIGHTYELLOW, COLOR_BLUE);
-    init_pair (__LUIC__WBACLR, COLOR_LIGHTBLUE,   COLOR_BLUE);
-    init_pair (__LUIC__WBBCLR, COLOR_BLACK,       COLOR_BLUE);
-    */
-
-    /* CYAN Theme
-    init_pair (__LUIC__BCKCLR,  COLOR_LIGHTCYAN, COLOR_BLUE);
-    init_pair (__LUIC__SHDWCLR, COLOR_GREY,      COLOR_BLACK);
-
-    init_pair (__LUIC__WNDGRN, COLOR_LIGHTGREEN,  COLOR_CYAN);
-    init_pair (__LUIC__WNDCLR, COLOR_LIGHTYELLOW, COLOR_CYAN);
-    init_pair (__LUIC__WBACLR, COLOR_LIGHTCYAN,   COLOR_CYAN);
-    init_pair (__LUIC__WBBCLR, COLOR_BLUE,        COLOR_CYAN);
-    */
-
-    /* DEFAULT Theme
-    init_pair (__LUIC__BCKCLR,  COLOR_LIGHTCYAN, COLOR_BLUE);
-    init_pair (__LUIC__SHDWCLR, COLOR_GREY,      COLOR_BLACK);
-
-    init_pair (__LUIC__WNDGRN, COLOR_LIGHTGREEN, COLOR_WHITE);
-    init_pair (__LUIC__WNDCLR, COLOR_LIGHTBLUE,  COLOR_WHITE);
-    init_pair (__LUIC__WBACLR, COLOR_LIGHTWHITE, COLOR_WHITE);
-    init_pair (__LUIC__WBBCLR, COLOR_GREY,       COLOR_WHITE);
-    */
 };
 
 i16 LUIC::iohandle::getchild(component* p_child) {

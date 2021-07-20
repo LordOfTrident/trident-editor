@@ -13,7 +13,22 @@
 #include "ceditor.hh"
 #include "scbl.hh"
 
-using namespace LUIC;
+#define SCBL_TABSIZE 0
+#define SCBL_COLOR   1
+
+#define SCBL_BG    100
+#define SCBL_FG    101
+#define SCBL_FRAME 102
+
+#define SCBL_KEYWORD  103
+#define SCBL_STRING   104
+#define SCBL_NUMBER   105
+#define SCBL_BOOLEAN  106
+#define SCBL_DATATYPE 107
+#define SCBL_STD      108
+#define SCBL_COMMENT  109
+
+extern str scblerr;
 
 class app {
 public: 
@@ -35,36 +50,38 @@ private:
     bool running;
     i8   scblok;
 
+    SCBL::SCBL_Interpreter SCBLi;
+
     str homedir;
 
-    iohandle ioh;
-    topbar   menubar;
+    LUIC::iohandle ioh;
+    LUIC::topbar   menubar;
 
-    frame   filemenu;
-    textbar filename;
-    button  fileclose,
-            fileok;
-    label   filemsg;
+    LUIC::frame   filemenu;
+    LUIC::textbar filename;
+    LUIC::button  fileclose,
+                  fileok;
+    LUIC::label   filemsg;
 
-    bool    sfowagr;
-    frame   sfilemenu;
-    textbar sfilename;
-    button  sfileclose,
-            sfileok;
-    label   sfilemsg;
+    bool sfowagr;
+    LUIC::frame   sfilemenu;
+    LUIC::textbar sfilename;
+    LUIC::button  sfileclose,
+                  sfileok;
+    LUIC::label   sfilemsg; 
 
-    frame  crdtsframe;
-    label  crdtslabel;
-    button crdtsok;
+    LUIC::frame  crdtsframe;
+    LUIC::label  crdtslabel;
+    LUIC::button crdtsok;
 
-    frame atblframe;
-    label atbllabel,
-          atblline;
-    vector <component*> atblbtns;
+    LUIC::frame atblframe;
+    LUIC::label atbllabel,
+                atblline;
+    vector <LUIC::component*> atblbtns;
 
-    frame scblframe;
-    label scblmsg;
+    LUIC::frame scblframe;
+    LUIC::label scblmsg;
 
     vector <ceditor> ceditors;
-    i8              idx_linfcs;
+    i8               idx_linfcs;
 };

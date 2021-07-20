@@ -39,7 +39,7 @@ namespace LUIC {
         bool prsd,
              modif;
 
-        ui16 curpos,
+        ui32 curpos,
              curx,
              cury,
              scrx,

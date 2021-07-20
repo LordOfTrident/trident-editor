@@ -52,7 +52,7 @@ void app::strtof(str p_txt, str p_fname) {
 };
 
 app::app(i32 argc, ch* argv[]) {
-    ioh = iohandle (
+    ioh = LUIC::iohandle (
         "Trident Editor", 
         LUIC_FLAGS_IOH_NOESCDELAY | LUIC_FLAGS_IOH_CLEARSCR
     );
@@ -61,37 +61,37 @@ app::app(i32 argc, ch* argv[]) {
     //ioh .setttl  ("Trident Editor");
     //ioh .setbody ("Made by LordOfTrident using NCurses\n\nControls:\n* Mouse - Everything\n* ESC - Menu bar\n* Arrows - Change navigate cursor/menu bar");
 
-    menubar = topbar (
+    menubar = LUIC::topbar (
         "TR-ED",
         {
-            option ("File", {
-                suboption("New",     "CTRL+N"), 
-                suboption("Load",    "CTRL+L"), 
-                suboption("Save",    "CTRL+S"),
-                suboption("Save As", ""),
-                suboption("Exit",    "CTRL+Q")
+            LUIC::option ("File", {
+                LUIC::suboption("New",     "CTRL+N"), 
+                LUIC::suboption("Load",    "CTRL+L"), 
+                LUIC::suboption("Save",    "CTRL+S"),
+                LUIC::suboption("Save As", ""),
+                LUIC::suboption("Exit",    "CTRL+Q")
             }),
 
-            option ("Edit", {
-                suboption("Copy",  "CTRL+C"), 
-                suboption("Cut",   "CTRL+X"),
-                suboption("Paste", "CTRL+V")
+            LUIC::option ("Edit", {
+                LUIC::suboption("Copy",  "CTRL+C"), 
+                LUIC::suboption("Cut",   "CTRL+X"),
+                LUIC::suboption("Paste", "CTRL+V")
             }),
 
-            option ("Tools", {
-                suboption("ASCII Table", "CTRL+A")
+            LUIC::option ("Tools", {
+                LUIC::suboption("ASCII Table", "CTRL+A")
             }),
 
-            option ("Help", {
-                suboption("About", ""),
-                suboption("Credits", "")
+            LUIC::option ("Help", {
+                LUIC::suboption("About", ""),
+                LUIC::suboption("Credits", "")
             })
         }
     );
 
     ioh.addchild(&menubar);
 
-    filemenu = frame (
+    filemenu = LUIC::frame (
         "Load File",
         ioh.getwsizex() / 2 - 20,
         ioh.getwsizey() / 2 - 5,
@@ -102,7 +102,7 @@ app::app(i32 argc, ch* argv[]) {
     filemenu .setvsble (false);
     ioh .addchild (&filemenu);
 
-    filename = textbar (
+    filename = LUIC::textbar (
         1, 
         1, 
         38,
@@ -110,7 +110,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     filemenu .addchild (&filename);
 
-    filemsg = label (
+    filemsg = LUIC::label (
         "",
         2,
         4,
@@ -118,7 +118,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     filemenu .addchild (&filemsg);
 
-    fileclose = button (
+    fileclose = LUIC::button (
         "Close",
         filemenu.getszx() - 9,
         filemenu.getszy() - 2,
@@ -128,7 +128,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     filemenu .addchild (&fileclose);
     
-    fileok = button (
+    fileok = LUIC::button (
         "Ok",
         filemenu.getszx() - 19,
         filemenu.getszy() - 2,
@@ -138,7 +138,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     filemenu .addchild (&fileok);
 
-    sfilemenu = frame (
+    sfilemenu = LUIC::frame (
         "Save File As",
         ioh.getwsizex() / 2 - 20,
         ioh.getwsizey() / 2 - 5,
@@ -149,7 +149,7 @@ app::app(i32 argc, ch* argv[]) {
     sfilemenu .setvsble (false);
     ioh .addchild (&sfilemenu);
 
-    sfilename = textbar (
+    sfilename = LUIC::textbar (
         1, 
         1, 
         38,
@@ -157,7 +157,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     sfilemenu .addchild (&sfilename);
 
-    sfilemsg = label (
+    sfilemsg = LUIC::label (
         "",
         2,
         4,
@@ -165,7 +165,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     sfilemenu .addchild (&sfilemsg);
 
-    sfileclose = button (
+    sfileclose = LUIC::button (
         "Close",
         sfilemenu.getszx() - 9,
         sfilemenu.getszy() - 2,
@@ -175,7 +175,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     sfilemenu .addchild (&sfileclose);
     
-    sfileok = button (
+    sfileok = LUIC::button (
         "Ok",
         sfilemenu.getszx() - 19,
         sfilemenu.getszy() - 2,
@@ -185,7 +185,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     sfilemenu .addchild (&sfileok);
 
-    crdtsframe = frame (
+    crdtsframe = LUIC::frame (
         "Credits",
         ioh.getwsizex() / 2 - 15,
         ioh.getwsizey() / 2 - 4,
@@ -196,7 +196,7 @@ app::app(i32 argc, ch* argv[]) {
     crdtsframe .setvsble (false);
     ioh .addchild (&crdtsframe);
 
-    crdtslabel = label (
+    crdtslabel = LUIC::label (
         "    Made By LordOfTrident\n        Using NCurses",
         1,
         2,
@@ -204,7 +204,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     crdtsframe .addchild (&crdtslabel);
 
-    crdtsok = button (
+    crdtsok = LUIC::button (
         "Ok",
         crdtsframe.getszx() / 2 - 4,
         crdtsframe.getszy() - 2,
@@ -214,7 +214,7 @@ app::app(i32 argc, ch* argv[]) {
     );
     crdtsframe .addchild (&crdtsok);
 
-    atblframe = frame(
+    atblframe = LUIC::frame(
         "ASCII Table",
         ioh.getwsizex() / 2 - 25,
         ioh.getwsizey() / 2 - 11,
@@ -234,7 +234,7 @@ app::app(i32 argc, ch* argv[]) {
             ++ posy;
         };
 
-        button* btn = new button(
+        LUIC::button* btn = new LUIC::button(
             i < 32 || i > 126? " " : str(1, i),
             1 + posx,
             posy,
@@ -259,8 +259,8 @@ app::app(i32 argc, ch* argv[]) {
         ++ posx;
     };
 
-    atblline = label (
-        str(30, ACS_HLINE),
+    atblline = LUIC::label (
+        str(32, ACS_HLINE),
         1,
         5,
         LUIC_FLAGS_LBL_ALTCHARSET
@@ -273,7 +273,7 @@ app::app(i32 argc, ch* argv[]) {
 
     atblframe .addchild (&atblline);
 
-    atbllabel = label(
+    atbllabel = LUIC::label(
         "CH: - | CNTRL: - | DEC: -",
         2,
         6,
@@ -282,7 +282,7 @@ app::app(i32 argc, ch* argv[]) {
 
     atblframe .addchild (&atbllabel);
 
-    scblframe = frame(
+    scblframe = LUIC::frame(
         "SCBL",
         ioh.getwsizex() / 2 - 20,
         ioh.getwsizey() / 2 - 4,
@@ -293,7 +293,7 @@ app::app(i32 argc, ch* argv[]) {
 
     ioh .addchild (&scblframe);
 
-    scblmsg = label(
+    scblmsg = LUIC::label(
         "",
         1,
         1,
@@ -319,8 +319,6 @@ app::app(i32 argc, ch* argv[]) {
         if (!fexists (homedir + "/.config/tr-ed/settings.scbl"))
             strtof (STTNGS_DEFAULT, homedir + "/.config/tr-ed/settings.scbl");
     };
-
-	SCBL::SCBL_Interpreter SCBLi;
 
 	SCBLi.AddConstant(SCBL::Constant("tabsize", SCBL_TABSIZE));
 	SCBLi.AddConstant(SCBL::Constant("color",   SCBL_COLOR));
@@ -555,7 +553,7 @@ void app::start() {
 
         atbllabel .settxt ("CH: - | CNTRL: - | DEC: -");
         for (ui8 i = 0; i < (ui8)atblbtns.size(); ++ i) {
-            button* btn = (button*)atblbtns[i];
+            LUIC::button* btn = (LUIC::button*)atblbtns[i];
 
             if (btn->lstinfcs()) {
                 atbllabel .settxt ("CH: " + (i < 32 || i > 126? "-" : str(1, i)) + " | CNTRL: " + (i < 32 || i > 126? "Y" : "N") + " | DEC: " + std::to_string(i));
@@ -587,6 +585,6 @@ void app::start() {
     };
 
     for (ui8 i = 0; i < (ui8)atblbtns.size(); ++ i) {
-        delete (button*)atblbtns[i];
+        delete (LUIC::button*)atblbtns[i];
     };
 };

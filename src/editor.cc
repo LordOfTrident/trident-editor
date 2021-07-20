@@ -157,6 +157,36 @@ void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
                 prsd  = true;
                 infcs = true;
 
+                curx = p_evt->x - (parent == NULL? getposx () : parent->getposx ()) + scrx - 1;
+                cury = p_evt->y - (parent == NULL? getposy () : parent->getposy ()) + scry - 1;
+
+                curpos  = 0;
+                ui32 cx = 0, 
+                     cy = 0;
+
+                for (ui32 i = 0; i < (ui32)txt.length(); ++ i) {
+                    if (txt[i] == 10) {
+                        ++ cy;
+
+                        curpos = i + 1;
+                    };
+
+                    if (cury == cy) break;
+                };
+
+                if (cury != cy) cury = cy;
+
+                for (ui32 i = curpos; i <= (ui32)txt.length(); ++ i) {
+                    if (txt[i] == 10 || cx == curx || i == (ui32)txt.length()) {
+                        curx = cx;
+                        curpos += curx;
+
+                        break;
+                    };
+
+                    ++ cx;
+                };
+
                 ioh->__schldfcsed (false);
                 __fcsprnts ();
             };
@@ -254,6 +284,85 @@ void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
                 ++ curx;
 
             ++ curpos;
+
+            break;
+        };
+
+        case KEY_UP: {
+            if (!infcs) break;
+
+            ui32 cx = curx;
+
+            -- cury;
+            -- curpos;
+
+            for (i32 i = curpos; i >= -1; -- i) {
+                if (txt[i] == 10) {
+                    cx = 0;
+                    -- curpos;
+
+                    for (i32 i = curpos; i >= -1; -- i) {
+                        if (txt[i] == 10 || i == -1) break;
+
+                        -- curpos;
+                        ++ cx;
+                    };
+
+                    if (curx > cx) curx = cx;
+                    curpos += curx + 1;
+
+                    break;
+                };
+
+                if (i == -1) {
+                    curx = cx;
+                    ++ cury;
+                    ++ curpos;
+
+                    break;
+                };
+
+                -- curpos;
+                -- cx;
+            };
+
+            break;
+        };
+
+        case KEY_DOWN: {
+            if (!infcs) break;
+
+            ui32 cx = curx;
+
+            ++ cury;
+
+            for (ui32 i = curpos; i <= (ui32)txt.length(); ++ i) {
+                if (txt[i] == 10) {
+                    cx = 0;
+                    ++ curpos;
+
+                    for (ui32 i = curpos; i <= (ui32)txt.length(); ++ i) {
+                        if (txt[i] == 10 || i == (ui32)txt.length() || cx == curx) break;
+
+                        ++ curpos;
+                        ++ cx;
+                    };
+
+                    curx = cx;
+
+                    break;
+                };
+
+                if (i == txt.length()) {
+                    curx = cx;
+                    -- cury;
+
+                    break;
+                };
+
+                ++ curpos;
+                ++ cx;
+            };
 
             break;
         };
