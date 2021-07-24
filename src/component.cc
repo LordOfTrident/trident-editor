@@ -110,7 +110,10 @@ ui16 LUIC::component::getposy() {
     return posy;
 };
 
-void LUIC::component::setsz(ui16 p_szx, ui16 p_szy) {
+void LUIC::component::setsz(i16 p_szx, i16 p_szy) {
+    if (p_szx < 0) p_szx = 0;
+    if (p_szy < 0) p_szy = 0;
+
     wnd.setsz(p_szx, p_szy);
 
     for (i16 i = (i16)children.size() - 1; i >= 0; -- i) {

@@ -134,6 +134,25 @@ i16 LUIC::iohandle::input() {
 
     for (i16 i = (i16)children.size() - 1; i >= 0; -- i) {
         component* child = children[i];
+
+        if (child->getflags() & LUIC_FLAGS_COMPONENT_SCALED) {
+            if (child->getszx() + child->getposx() != getwsizex()) 
+                child->setsz((getwsizex() - child->getposx() < 2)? 2 : getwsizex() - child->getposx(), child->getszy());
+            
+            if (child->getszy() + child->getposy() != getwsizey()) 
+                child->setsz(child->getszx(), (getwsizey() - child->getposy() < 2)? 2 : getwsizey() - child->getposy());
+        } else {
+            if (child->getflags() & LUIC_FLAGS_COMPONENT_SCALEDX) {
+                if (child->getszx() + child->getposx() != getwsizex()) 
+                    child->setsz((getwsizex() - child->getposx() < 2)? 2 : getwsizex() - child->getposx(), child->getszy());
+            };
+            
+            if (child->getflags() & LUIC_FLAGS_COMPONENT_SCALEDY) {
+                if (child->getszy() + child->getposy() != getwsizey()) 
+                    child->setsz(child->getszx(), (getwsizey() - child->getposy() < 2)? 2 : getwsizey() - child->getposy());
+            };
+        };
+
         child->input (in, &evt);
 
         if (child != children[i]) -- i;

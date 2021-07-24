@@ -23,7 +23,7 @@ bool app::fexists(str p_name) {
 
 str app::ftostr(str p_fname) {
     str           fstr = "";
-    std::ifstream fhnd (p_fname.c_str());
+    std::ifstream fhnd (p_fname);
 
     if (fhnd.is_open()) {
         str fln = "";
@@ -46,7 +46,7 @@ str app::ftostr(str p_fname) {
 };
 
 void app::strtof(str p_txt, str p_fname) {
-    std::ofstream fhnd(p_fname.c_str());
+    std::ofstream fhnd(p_fname);
 
     fhnd << p_txt;
 };
@@ -309,8 +309,17 @@ app::app(i32 argc, ch* argv[]) {
     init_pair(__CEDIT_COL__DEF_GRN, COLOR_LIGHTGREEN, COLOR_BLACK);
     init_pair(__CEDIT_COL__DEF_FRM, COLOR_WHITE,      COLOR_BLACK);
 
+    init_pair(__CEDIT_COL__KEYWORD, COLOR_WHITE, COLOR_LIGHTMAGENTA);
+    init_pair(__CEDIT_COL__STRING,  COLOR_WHITE, COLOR_LIGHTGREEN);
+    init_pair(__CEDIT_COL__NUMBER,  COLOR_WHITE, COLOR_CYAN);
+    init_pair(__CEDIT_COL__BOOLEAN, COLOR_WHITE, COLOR_MAGENTA);
+    init_pair(__CEDIT_COL__DATATYP, COLOR_WHITE, COLOR_LIGHTCYAN);
+    init_pair(__CEDIT_COL__STD,     COLOR_WHITE, COLOR_LIGHTYELLOW);
+    init_pair(__CEDIT_COL__COMMENT, COLOR_WHITE, COLOR_GREY);
+    init_pair(__CEDIT_COL__PREPROC, COLOR_WHITE, COLOR_LIGHTRED);
+
     homedir = getenv("HOME");
-    #define STTNGS_DEFAULT "set tabsize 4;\nset color background black;\nset color foreground white;\nset color frame white;\nset color comment grey;\nset color keyword brightmagenta;\nset color string brightgreen;\nset color number cyan;\nset color boolean magenta;\nset color datatype brightcyan;\nset color std brightyellow;"
+    #define STTNGS_DEFAULT "set tabsize 4;\nset color background black;\nset color foreground white;\nset color frame white;\nset color comment grey;\nset color keyword brightmagenta;\nset color string brightgreen;\nset color number cyan;\nset color boolean magenta;\nset color datatype brightcyan;\nset color std brightyellow;\nset color preproc brightred;"
 
     if (!dexists (homedir + "/.config/tr-ed")) {
         maked  (homedir + "/.config/tr-ed");
@@ -333,6 +342,7 @@ app::app(i32 argc, ch* argv[]) {
 	SCBLi.AddConstant(SCBL::Constant("datatype",   SCBL_DATATYPE));
 	SCBLi.AddConstant(SCBL::Constant("std",        SCBL_STD));
 	SCBLi.AddConstant(SCBL::Constant("comment",    SCBL_COMMENT));
+	SCBLi.AddConstant(SCBL::Constant("preproc",    SCBL_PREPROC));
 
 	SCBLi.AddConstant(SCBL::Constant("black",   COLOR_BLACK));
 	SCBLi.AddConstant(SCBL::Constant("red",     COLOR_RED));
@@ -403,11 +413,16 @@ app::app(i32 argc, ch* argv[]) {
         };
 	}));
 
+    i16 cex = argc - 2, cey = 1;
     for (ui8 i = 1; i < argc; ++ i) {
-        if (fexists(argv[i])) {
-            ceditors .push_back (ceditor (&ioh, argv[i], ftostr(argv[i])));
-            filemenu .setvsble  (false);
-        };
+        ceditors .push_back (ceditor (&ioh, argv[i], fexists(argv[i])? ftostr(argv[i]) : "", cex, cey, ioh.getwsizex() - cex, ioh.getwsizey() - cey));
+        filemenu .setvsble  (false);
+
+        -- cex;
+        ++ cey;
+
+        if (cex < 0) cex = argc - 2;
+        if (cey > ioh.getwsizey()) cey = 1;
     };
 
     scblok = SCBLi .Parse (ftostr(homedir + "/.config/tr-ed/settings.scbl"));
@@ -563,9 +578,18 @@ void app::start() {
         };
 
         for (i16 i = 0; i < (i16)ceditors.size(); ++ i) {
+            LUIC::frame* ceditfrm = ceditors[i].getfrm();
+            ceditfrm->setflags(LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE);
+
+            if (ceditfrm->getposx() + ceditfrm->getszx() == ioh.getwsizex())
+                ceditfrm->setflags(ceditfrm->getflags() | LUIC_FLAGS_COMPONENT_SCALEDX);
+
+            if (ceditfrm->getposy() + ceditfrm->getszy() == ioh.getwsizey())
+                ceditfrm->setflags(ceditfrm->getflags() | LUIC_FLAGS_COMPONENT_SCALEDY);
+
             if (!ceditors[i].getfrm()->getvsble()) {
                 ceditors[i] .cleanup ();
-                ceditors.erase(ceditors.begin() + i);
+                ceditors .erase (ceditors .begin () + i);
 
                 if (idx_linfcs == i) 
                     idx_linfcs = -1;

@@ -51,6 +51,46 @@ ceditor::ceditor(LUIC::iohandle *p_ioh, str p_ttl, str p_txt) {
     setfname(p_ttl);
 };
 
+ceditor::ceditor(LUIC::iohandle *p_ioh, str p_ttl, str p_txt, i16 p_posx, i16 p_posy, ui16 p_szx, ui16 p_szy) {
+    frm = new LUIC::frame (
+        p_ttl, 
+        p_posx,
+        p_posy,
+        p_szx,
+        p_szy,
+        LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE
+    );
+
+    p_ioh->addchild (frm);
+
+    txtbx = new LUIC::editor(
+        1,
+        1,
+        20,
+        5,
+        0
+    );
+
+    txtbx->settxt (p_txt);
+    txtbx->setcolschm ({
+        __LUIC__SHDWCLR,
+        __CEDIT_COL__DEF_FRM,
+        __CEDIT_COL__DEF
+    });
+
+    frm->addchild (txtbx);
+    frm->setcolschm ({
+        __LUIC__SHDWCLR,
+        __CEDIT_COL__DEF_FRM,
+        __CEDIT_COL__DEF_FRM,
+        __CEDIT_COL__DEF_GRN,
+        __LUIC__SYSCLR,
+        __CEDIT_COL__DEF_FRM
+    });
+
+    setfname(p_ttl);
+};
+
 void ceditor::setfname(str p_ttl) {
     frm->setttl  (p_ttl);
     txtbx->setttl (p_ttl);

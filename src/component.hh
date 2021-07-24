@@ -40,7 +40,7 @@ namespace LUIC {
         ui16 getposx ();
         ui16 getposy ();
 
-        void setsz   (ui16 p_szx, ui16 p_szy);
+        void setsz   (i16 p_szx, i16 p_szy);
         ui16 getszx  ();
         ui16 getszy  ();
 

@@ -27,6 +27,7 @@
 #define SCBL_DATATYPE 107
 #define SCBL_STD      108
 #define SCBL_COMMENT  109
+#define SCBL_PREPROC  110
 
 extern str scblerr;
 

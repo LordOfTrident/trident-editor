@@ -35,6 +35,7 @@ The color option wants a few more parameters, first one being one of the listed 
 - datatype (NOT DONE!): Language data types highlight color
 - std (NOT DONE!): Standard language functions/namespaces highlight color
 - comment (NOT DONE!): Comment highlight color
+- prerpoc (NOT DONE!): Pre-processor directives
 
 The next parameter will be the color. List of colors:
 - black
