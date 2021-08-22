@@ -14,10 +14,10 @@ if [ "$1" != "-nc" ]; then
 fi
 printf "\e[0;36m* CMPL: \e[0;33mCompiling...\n\e[0m";
 
-if g++ -g src/*.cc -o bin/tr-ed -O3 -s -Wall -std=c++17 -lstdc++fs -lncursesw; then
+if g++ -g src/*.cc -o bin/app -O3 -s -Wall -std=c++17 -lstdc++fs -lncursesw; then
     printf "\e[0;36m* CMPL: \e[0;32mCompiled Succesfully\n";
 
-    printf "\e[0;36m* CMPL: \e[0;33mCopying binary "tr-ed" to /usr/bin...\n\e[0m";
+    printf "\e[0;36m* CMPL: \e[0;33mCopying binary "app" to "/usr/bin" as "tr-ed"...\n\e[0m";
     sudo cp ./bin/tr-ed /usr/bin/
     printf "\e[0;36m* CMPL: \e[0;32mDone.\n";
 else
