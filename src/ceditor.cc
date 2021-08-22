@@ -1,149 +1,132 @@
 #include "ceditor.hh"
 
-i8 editor_fg = COLOR_WHITE, 
-   editor_bg = COLOR_BLACK;
+str __gext(str p_Str) {
+	sword lastdotpos = -1;
 
-bool __endsw(str p_str, str p_sub) {
-    if (p_sub.length() > p_str.length() || p_str.substr(p_str.length() - p_sub.length(), p_sub.length()) != p_sub) return false;
+	for (word i = 0; i < p_Str.length(); ++ i)
+		if (p_Str[i] == '.')
+			lastdotpos = i;
 
-    return true;
+	return lastdotpos == -1? "?" : p_Str.substr(lastdotpos);
 };
 
-ceditor::ceditor() {};
+CEditor::CEditor() {};
 
-ceditor::ceditor(LUIC::iohandle *p_ioh, str p_ttl, str p_txt) {
-    frm = new LUIC::frame (
-        p_ttl, 
-        0, 
-        1, 
-        p_ioh->getwsizex(),
-        p_ioh->getwsizey() - 1,
-        LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE
-    );
+CEditor::CEditor(LUIC::IOHandle *p_IOH, str p_Title, str p_Text, std::vector <str> p_Settings) {
+	Frame = new LUIC::Frame (
+		p_Title,
+		0,
+		1,
+		p_IOH->GetWindowSizeX(),
+		p_IOH->GetWindowSizeY() - 1,
+		LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE
+	);
 
-    p_ioh->addchild (frm);
+	p_IOH->AddChild(Frame);
 
-    txtbx = new LUIC::editor(
-        1,
-        1,
-        20,
-        5,
-        0
-    );
+	Editor = new LUIC::Editor(
+		1,
+		1,
+		20,
+		5,
+		(bool)p_Settings[SETTING_CURBLINK][0]? LUIC_FLAGS_EDITOR_CURSORBLINK : 0
+	);
 
-    txtbx->settxt (p_txt);
-    txtbx->setcolschm ({
-        __LUIC__SHDWCLR,
-        __CEDIT_COL__DEF_FRM,
-        __CEDIT_COL__DEF
-    });
+	Editor->SetText(p_Text);
+	Editor->SetColorscheme({
+		__LUIC__SHDWCLR,
+		__CEDIT_COL__DEF_FRM,
+		__CEDIT_COL__DEF
+	});
 
-    frm->addchild (txtbx);
-    frm->setcolschm ({
-        __LUIC__SHDWCLR,
-        __CEDIT_COL__DEF_FRM,
-        __CEDIT_COL__DEF_FRM,
-        __CEDIT_COL__DEF_GRN,
-        __LUIC__SYSCLR,
-        __CEDIT_COL__DEF_FRM
-    });
+	Frame->AddChild(Editor);
+	Frame->SetColorscheme({
+		__LUIC__SHDWCLR,
+		__CEDIT_COL__DEF_FRM,
+		__CEDIT_COL__DEF_FRM,
+		__CEDIT_COL__DEF_GRN,
+		__LUIC__SYSCLR,
+		__CEDIT_COL__DEF_FRM
+	});
 
-    setfname(p_ttl);
+	SetTabSize((ui8)p_Settings[SETTING_TABSIZE][0]);
+	SetFrameName(p_Title);
 };
 
-ceditor::ceditor(LUIC::iohandle *p_ioh, str p_ttl, str p_txt, i16 p_posx, i16 p_posy, ui16 p_szx, ui16 p_szy) {
-    frm = new LUIC::frame (
-        p_ttl, 
-        p_posx,
-        p_posy,
-        p_szx,
-        p_szy,
-        LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE
-    );
+CEditor::CEditor(LUIC::IOHandle *p_IOH, str p_Title, str p_Text, i16 p_PosX, i16 p_PosY, ui16 p_SizeX, ui16 p_SizeY, std::vector <str> p_Settings) {
+	Frame = new LUIC::Frame(
+		p_Title,
+		p_PosX,
+		p_PosY,
+		p_SizeX,
+		p_SizeY,
+		LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE
+	);
 
-    p_ioh->addchild (frm);
+	p_IOH->AddChild(Frame);
 
-    txtbx = new LUIC::editor(
-        1,
-        1,
-        20,
-        5,
-        0
-    );
+	Editor = new LUIC::Editor(
+		1,
+		1,
+		20,
+		5,
+		(bool)p_Settings[SETTING_CURBLINK][0]? LUIC_FLAGS_EDITOR_CURSORBLINK : 0
+	);
 
-    txtbx->settxt (p_txt);
-    txtbx->setcolschm ({
-        __LUIC__SHDWCLR,
-        __CEDIT_COL__DEF_FRM,
-        __CEDIT_COL__DEF
-    });
+	Editor->SetText(p_Text);
+	Editor->SetColorscheme({
+		__LUIC__SHDWCLR,
+		__CEDIT_COL__DEF_FRM,
+		__CEDIT_COL__DEF
+	});
 
-    frm->addchild (txtbx);
-    frm->setcolschm ({
-        __LUIC__SHDWCLR,
-        __CEDIT_COL__DEF_FRM,
-        __CEDIT_COL__DEF_FRM,
-        __CEDIT_COL__DEF_GRN,
-        __LUIC__SYSCLR,
-        __CEDIT_COL__DEF_FRM
-    });
+	Frame->AddChild(Editor);
+	Frame->SetColorscheme({
+		__LUIC__SHDWCLR,
+		__CEDIT_COL__DEF_FRM,
+		__CEDIT_COL__DEF_FRM,
+		__CEDIT_COL__DEF_GRN,
+		__LUIC__SYSCLR,
+		__CEDIT_COL__DEF_FRM
+	});
 
-    setfname(p_ttl);
+	SetTabSize((ui8)p_Settings[SETTING_TABSIZE][0]);
+	SetFrameName(p_Title);
 };
 
-void ceditor::setfname(str p_ttl) {
-    frm->setttl  (p_ttl);
-    txtbx->setttl (p_ttl);
+void CEditor::SetFrameName(str p_Title) {
+	Frame->SetTitle(p_Title);
+	Editor->SetTitle(p_Title);
 
-    str ft = "txt";
+	str FT = __gext(p_Title);
 
-    if (__endsw(p_ttl, ".cpp") || __endsw(p_ttl, ".cc") || __endsw(p_ttl, ".cxx") || __endsw(p_ttl, ".c++") ||
-        __endsw(p_ttl, ".hpp") || __endsw(p_ttl, ".hh") || __endsw(p_ttl, ".hxx") || __endsw(p_ttl, ".h++")) ft = "C++";
-    else if (__endsw(p_ttl, ".pas") || __endsw(p_ttl, ".inc")) ft = "Pascal";
-    else if (__endsw(p_ttl, ".tm")) ft = "Temple";
-    else if (__endsw(p_ttl, ".lua")) ft = "Lua";
-    else if (__endsw(p_ttl, ".js")) ft = "JavaScript";
-    else if (__endsw(p_ttl, ".c") || __endsw(p_ttl, ".h")) ft = "C";
-    else if (__endsw(p_ttl, ".cs")) ft = "C#";
-    else if (__endsw(p_ttl, ".py")) ft = "Python";
-    else if (__endsw(p_ttl, ".atm")) ft = "Atoment";
-    else if (__endsw(p_ttl, ".rs")) ft = "Rust";
-    else if (__endsw(p_ttl, ".sh") || __endsw(p_ttl, ".bash")) ft = "Bash";
-    else if (__endsw(p_ttl, ".bat")) ft = "Batch";
-    else if (__endsw(p_ttl, ".asm")) ft = "Assembly";
-    else if (__endsw(p_ttl, ".scbl")) ft = "SCBL";
-    else if (__endsw(p_ttl, ".rb")) ft = "Ruby";
-    else if (__endsw(p_ttl, ".go")) ft = "Go";
-    else if (__endsw(p_ttl, ".java")) ft = "Java";
-    else if (__endsw(p_ttl, ".f") || __endsw(p_ttl, ".for") || __endsw(p_ttl, ".fpp")) ft = "Fortran";
-    else if (__endsw(p_ttl, ".json")) ft = "Json";
-    else if (__endsw(p_ttl, ".xml")) ft = "XML";
-    else if (__endsw(p_ttl, ".css")) ft = "CSS";
-    else if (__endsw(p_ttl, ".html")) ft = "HTML";
- 
-    txtbx->setft (ft);
+	Editor->SetFT(FT);
 };
 
-str ceditor::getfname() {
-    return txtbx->getttl ();
+str CEditor::GetFrameName() {
+	return Editor->GetTitle();
 };
 
-void ceditor::cleanup () {
-    if (frm != NULL) {
-        frm->remchild(frm->getchild(txtbx));
+void CEditor::Cleanup() {
+	if (Frame != NULL) {
+		Frame->RemoveChild(Frame->GetChild(Editor));
 
-        LUIC::iohandle* ioh = frm->getioh();
-        ioh->remchild(ioh->getchild(frm));
+		LUIC::IOHandle* IOH = Frame->GetIOHandle();
+		IOH->RemoveChild(IOH->GetChild(Frame));
 
-        delete txtbx;
-        delete frm;
-    };
+		delete Editor;
+		delete Frame;
+	};
 };
 
-LUIC::frame *ceditor::getfrm() {
-    return frm;
+LUIC::Frame *CEditor::GetFrame() {
+	return Frame;
 };
 
-LUIC::editor *ceditor::gettxtbx() {
-    return txtbx;
+LUIC::Editor *CEditor::GetEditor() {
+	return Editor;
+};
+
+void CEditor::SetTabSize(ui8 p_tabsize) {
+	Editor->SetTabSize(p_tabsize);
 };

@@ -9,27 +9,21 @@
 #include "iohandle.hh"
 
 namespace LUIC {
-    class frame: public component {
-    public:
+	class Frame: public Component {
+	public:
+		Frame();
+		Frame(str p_Title, ui16 p_PosX, ui16 p_PosY, ui16 p_SizeX, ui16 p_SizeY, flags p_Flags);
 
-        frame ();
-        frame (str p_ttl, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags);
+		virtual void Draw();
+		virtual void Input(i16 p_Input, MEVENT* p_Event);
 
-        virtual void draw  ();
-        virtual void input (i16 p_in, MEVENT* p_evt);
+		void SetTitle(str p_Title);
+		str GetTitle();
 
-        void setttl (str p_ttl);
-        str  getttl ();
+	private:
+		str Title;
+		bool Pressed, Close, Drag, Resize;
 
-    private:
-
-        str   ttl;
-        bool  prsd,
-              clse,
-              drg,
-              rsz;
-
-        ui16 offstx, 
-             offsty;
-    };
+		ui16 OffsetX, OffsetY;
+	};
 };

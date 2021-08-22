@@ -8,23 +8,20 @@
 #include "iohandle.hh"
 
 namespace LUIC {
-    class textbar: public component {
-    public:
+	class TextBar: public Component {
+	public:
+		TextBar();
+		TextBar(ui16 p_PosX, ui16 p_PosY, ui16 p_SizeX, flags p_Flags);
 
-        textbar ();
-        textbar (ui16 p_posx, ui16 p_posy, ui16 p_szx, flags p_flags);
+		virtual void Draw();
+		virtual void Input(i16 p_Input, MEVENT* p_Event);
 
-        virtual void draw  ();
-        virtual void input (i16 p_in, MEVENT* p_evt);
+		void SetText(str p_Text);
+		str GetText();
 
-        void settxt (str p_txt);
-        str  gettxt ();
-
-    private:
-
-        str  txt;
-        bool prsd;
-        ui16 curpos,
-             scrx;
-    };
+	private:
+		str Text;
+		bool Pressed;
+		ui16 CurPos, ScrollX;
+	};
 };

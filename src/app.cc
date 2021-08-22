@@ -1,408 +1,506 @@
-#include "./app.hh"
+#include "app.hh"
 
-str scblerr = "";
+App::App(i32 argc, ch* argv[]) {
+	IOH = LUIC::IOHandle(
+		"Trident Editor",
+		LUIC_FLAGS_IOH_NOESCDELAY | LUIC_FLAGS_IOH_CLEARSCR
+	);
 
-bool app::dexists(str p_name) {
-    struct stat info;
-    
-    if (stat(p_name.c_str(), &info) != 0)
-        return false;
-    
-    return (info.st_mode & S_IFDIR) != 0;
+	IOH.InitTheme(true);
+
+	TopBar = LUIC::TopBar (
+		"TR-ED",
+		{
+			LUIC::Option("File", {
+				LUIC::SubOption("New",     "CTRL+N"),
+				LUIC::SubOption("Load",    "CTRL+L"),
+				LUIC::SubOption("Save",    "CTRL+S"),
+				LUIC::SubOption("Save As", ""),
+				LUIC::SubOption("Exit",    "CTRL+Q")
+			}),
+
+			LUIC::Option("Edit", {
+				LUIC::SubOption("Copy",  "CTRL+C"),
+				LUIC::SubOption("Cut",   "CTRL+X"),
+				LUIC::SubOption("Paste", "CTRL+V")
+			}),
+
+			LUIC::Option("Tools", {
+				LUIC::SubOption("ASCII Table",  "CTRL+A"),
+				LUIC::SubOption("Reset Config", "CTRL+R")
+			}),
+
+			LUIC::Option("Help", {
+				LUIC::SubOption("About", ""),
+				LUIC::SubOption("Credits", "")
+			})
+		}
+	);
+
+	IOH.AddChild(&TopBar);
+
+	LFileMenu = LUIC::Frame(
+		"Load File",
+		IOH.GetWindowSizeX() / 2 - 20,
+		IOH.GetWindowSizeY() / 2 - 5,
+		40,
+		10,
+		LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
+	);
+	LFileMenu.SetVisible(false);
+	IOH.AddChild(&LFileMenu);
+
+	LFileName = LUIC::TextBar(
+		1,
+		1,
+		38,
+		0
+	);
+	LFileMenu.AddChild(&LFileName);
+
+	LFileMsg = LUIC::Label(
+		"",
+		2,
+		4,
+		0
+	);
+	LFileMenu.AddChild(&LFileMsg);
+
+	LFileClose = LUIC::Button(
+		"Close",
+		LFileMenu.GetSizeX() - 9,
+		LFileMenu.GetSizeY() - 2,
+		9,
+		1,
+		0
+	);
+	LFileMenu.AddChild(&LFileClose);
+
+	LFileOk = LUIC::Button(
+		"Ok",
+		LFileMenu.GetSizeX() - 19,
+		LFileMenu.GetSizeY() - 2,
+		8,
+		1,
+		0
+	);
+	LFileMenu.AddChild(&LFileOk);
+
+	SFileMenu = LUIC::Frame(
+		"Save File As",
+		IOH.GetWindowSizeX() / 2 - 20,
+		IOH.GetWindowSizeY() / 2 - 5,
+		40,
+		10,
+		LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
+	);
+	SFileMenu.SetVisible(false);
+	IOH.AddChild(&SFileMenu);
+
+	SFileName = LUIC::TextBar(
+		1,
+		1,
+		38,
+		0
+	);
+	SFileMenu.AddChild(&SFileName);
+
+	SFileMsg = LUIC::Label(
+		"",
+		2,
+		4,
+		0
+	);
+	SFileMenu.AddChild(&SFileMsg);
+
+	SFileClose = LUIC::Button(
+		"Close",
+		SFileMenu.GetSizeX() - 9,
+		SFileMenu.GetSizeY() - 2,
+		9,
+		1,
+		0
+	);
+	SFileMenu.AddChild(&SFileClose);
+
+	SFileOk = LUIC::Button(
+		"Ok",
+		SFileMenu.GetSizeX() - 19,
+		SFileMenu.GetSizeY() - 2,
+		8,
+		1,
+		0
+	);
+	SFileMenu.AddChild(&SFileOk);
+
+	CreditsFrame = LUIC::Frame(
+		"Credits",
+		IOH.GetWindowSizeX() / 2 - 15,
+		IOH.GetWindowSizeY() / 2 - 4,
+		30,
+		8,
+		LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
+	);
+	CreditsFrame.SetVisible(false);
+	IOH.AddChild(&CreditsFrame);
+
+	CreditsLabel = LUIC::Label(
+		"    Made By LordOfTrident\n        Using NCurses",
+		1,
+		2,
+		0
+	);
+	CreditsFrame.AddChild(&CreditsLabel);
+
+	CreditsOk = LUIC::Button(
+		"Ok",
+		CreditsFrame.GetSizeX() / 2 - 4,
+		CreditsFrame.GetSizeY() - 2,
+		8,
+		1,
+		0
+	);
+	CreditsFrame.AddChild(&CreditsOk);
+
+	ASCIITableFrame = LUIC::Frame(
+		"ASCII Table",
+		IOH.GetWindowSizeX() / 2 - 25,
+		IOH.GetWindowSizeY() / 2 - 11,
+		34,
+		8,
+		LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
+	);
+
+	ASCIITableFrame.SetVisible(false);
+	IOH.AddChild(&ASCIITableFrame);
+
+	ui8 posx = 0, posy = 0;
+
+	for (ui8 i = 0; i < 128; ++ i) {
+		if (i % 32 == 0) {
+			posx = 0;
+
+			++ posy;
+		};
+
+		LUIC::Button* btn = new LUIC::Button(
+			i < 32 or i > 126? " " : str(1, i),
+			1 + posx,
+			posy,
+			1,
+			1,
+			0
+		);
+
+		btn->SetColorscheme({
+			__LUIC__SHDWCLR,
+			__LUIC__WNDCLR,
+			__LUIC__SYSCLR,
+			__LUIC__WBACLR,
+			__LUIC__WBBCLR,
+			__LUIC__TXTCLR,
+			__LUIC__COMMON
+		});
+
+		ASCIITableButtons.push_back(btn);
+		ASCIITableFrame.AddChild(btn);
+
+		++ posx;
+	};
+
+	ASCIITableLine = LUIC::Label(
+		str(32, ACS_HLINE),
+		1,
+		5,
+		LUIC_FLAGS_LBL_ALTCHARSET
+	);
+
+	ASCIITableLine.SetColorscheme({
+		__LUIC__WBACLR,
+		__LUIC__SHDWCLR
+	});
+
+	ASCIITableFrame.AddChild(&ASCIITableLine);
+
+	ASCIITableLabel = LUIC::Label(
+		"CH: - | CNTRL: - | DEC: -",
+		2,
+		6,
+		0
+	);
+
+	ASCIITableFrame.AddChild(&ASCIITableLabel);
+
+	SCBLFrame = LUIC::Frame(
+		"SCBL",
+		IOH.GetWindowSizeX() / 2 - 20,
+		IOH.GetWindowSizeY() / 2 - 4,
+		40,
+		8,
+		LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
+	);
+
+	IOH.AddChild(&SCBLFrame);
+
+	SCBLMsg = LUIC::Label(
+		"",
+		1,
+		1,
+		0
+	);
+
+	SCBLFrame.AddChild(&SCBLMsg);
+
+	HomeDir = getenv("HOME");
+	IdxLastInFocus = -1;
+	SFile = false;
+
+	Defaults();
+	InitSCBL();
+	ReadConfig();
+
+	i16 cex = argc - 2, cey = 1;
+	for (ui8 i = 1; i < argc; ++ i) {
+		str txt = FS::Exists(argv[i]) and not FS::IsADirectory(argv[i])? FS::ReadFile(argv[i]) : "";
+
+		CEditors.push_back(CEditor(
+			&IOH,
+			argv[i],
+			txt,
+			cex,
+			cey,
+			IOH.GetWindowSizeX() - cex,
+			IOH.GetWindowSizeY() - cey,
+			Settings
+		));
+		LFileMenu.SetVisible(false);
+
+		-- cex;
+		++ cey;
+
+		if (cex < 0)
+			cex = argc - 2;
+
+		if (cey > IOH.GetWindowSizeY())
+			cey = 1;
+
+		IdxLastInFocus = i - 1;
+	};
+
+	if (IdxLastInFocus != -1)
+		CEditors[IdxLastInFocus].GetEditor()->SetFocus(true);
+
+	if (SCBLFrame.GetVisible())
+		SCBLFrame.ToTop();
+
+	erase();
 };
 
-void app::maked(str p_name) {
-    mode_t mode = 0755;
+void App::Defaults() {
+	__ssttng(SETTING_TABSIZE, {4});
+	__ssttng(SETTING_CURBLINK, {1});
+	__ssttng(SETTING_THEMEFILE, "");
 
-    mkdir(p_name.c_str(), mode);
+	__sclr(SETTINGCOLOR_EDITORFG, COLOR_WHITE);
+	__sclr(SETTINGCOLOR_EDITORBG, COLOR_BLACK);
+	__sclr(SETTINGCOLOR_EDITORFRAMEFG, COLOR_WHITE);
+	__sclr(SETTINGCOLOR_EDITORFRAMEBG, COLOR_BLACK);
+
+	init_pair(__CEDIT_COL__DEF,     COLOR_WHITE,       COLOR_BLACK);
+	init_pair(__CEDIT_COL__DEF_GRN, COLOR_BRIGHTGREEN, COLOR_BLACK);
+	init_pair(__CEDIT_COL__DEF_FRM, COLOR_WHITE,       COLOR_BLACK);
+
+	init_pair(__CEDIT_COL__KEYWORD, COLOR_WHITE, COLOR_BRIGHTMAGENTA);
+	init_pair(__CEDIT_COL__STRING,  COLOR_WHITE, COLOR_BRIGHTGREEN);
+	init_pair(__CEDIT_COL__NUMBER,  COLOR_WHITE, COLOR_CYAN);
+	init_pair(__CEDIT_COL__BOOLEAN, COLOR_WHITE, COLOR_MAGENTA);
+	init_pair(__CEDIT_COL__DATATYP, COLOR_WHITE, COLOR_BRIGHTCYAN);
+	init_pair(__CEDIT_COL__STD,     COLOR_WHITE, COLOR_BRIGHTYELLOW);
+	init_pair(__CEDIT_COL__COMMENT, COLOR_WHITE, COLOR_GREY);
+	init_pair(__CEDIT_COL__PREPROC, COLOR_WHITE, COLOR_BRIGHTRED);
+
+	CreateOrFixPath(HomeDir + "/.config/tr-ed");
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/themes");
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/syntax");
+
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/settings.scbl", STTNGS_DEFAULT);
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/themes/default.scbl",   THEME_DEFAULT);
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/themes/classic.scbl",   THEME_CLASSIC);
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/themes/light.scbl",     THEME_LIGHT);
+	CreateOrFixPath(HomeDir + "/.config/tr-ed/themes/bubblegum.scbl", THEME_BUBBLEGUM);
 };
 
-bool app::fexists(str p_name) {
-    return access(p_name.c_str(), F_OK) != -1;
+void App::InitSCBL() {
+	SCBLi.SetUserData(this);
+
+	SCBLi.AddConstant(SCBL::Constant("true",  1, SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("false", 0, SCBL_CONSTANT_1BYTE));
+
+	SCBLi.AddConstant(SCBL::Constant("tabsize",     SCBL_TABSIZE, SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("color",       SCBL_COLOR,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("theme",       SCBL_THEME,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("cursorblink", SCBL_CURBLNK, SCBL_CONSTANT_1BYTE));
+
+	SCBLi.AddConstant(SCBL::Constant("background",      SCBL_BG,       SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("foreground",      SCBL_FG,       SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("frameforeground", SCBL_FRAME,    SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("framebackground", SCBL_FRAMEBG,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("keyword",         SCBL_KEYWORD,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("string",          SCBL_STRING,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("number",          SCBL_NUMBER,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("boolean",         SCBL_BOOLEAN,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("datatype",        SCBL_DATATYPE, SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("std",             SCBL_STD,      SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("comment",         SCBL_COMMENT,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("preproc",         SCBL_PREPROC,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("operators",       SCBL_OPERATOR, SCBL_CONSTANT_1BYTE));
+
+	SCBLi.AddConstant(SCBL::Constant("black",   COLOR_BLACK,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("red",     COLOR_RED,     SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("green",   COLOR_GREEN,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("yellow",  COLOR_YELLOW,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("blue",    COLOR_BLUE,    SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("magenta", COLOR_MAGENTA, SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("cyan",    COLOR_CYAN,    SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("white",   COLOR_WHITE,   SCBL_CONSTANT_1BYTE));
+
+	SCBLi.AddConstant(SCBL::Constant("grey",          COLOR_GREY,          SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightred",     COLOR_BRIGHTRED,     SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightgreen",   COLOR_BRIGHTGREEN,   SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightyellow",  COLOR_BRIGHTYELLOW,  SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightblue",    COLOR_BRIGHTBLUE,    SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightmagenta", COLOR_BRIGHTMAGENTA, SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightcyan",    COLOR_BRIGHTCYAN,    SCBL_CONSTANT_1BYTE));
+	SCBLi.AddConstant(SCBL::Constant("brightwhite",   COLOR_BRIGHTWHITE,   SCBL_CONSTANT_1BYTE));
 };
 
-str app::ftostr(str p_fname) {
-    str           fstr = "";
-    std::ifstream fhnd (p_fname);
+void App::ReadConfig() {
+	SCBLError = "";
+	SCBLOk = SCBL_RUNTIME_OK;
 
-    if (fhnd.is_open()) {
-        str fln = "";
+    SCBLi.SetFunction(SCBL::Function("set", [] (std::vector <ui8> Parameters, void* UserData) {
+        SCBL::ParameterHandler phnd(Parameters);
+        App *app = (App*)UserData;
 
-        while (getline(fhnd, fln)) {
-            for (i32 i = 0; i < (i32)fln.length(); ++ i) {
-                if (fln[i] == 9) {
-                    fln[i] = 32;
-                    fln.insert(i + 1, "   ");
-                };
-            };
+        ui8 arg = phnd.GetNextParam8();
 
-            fstr += fln + '\n';
-        };
-    };
-
-    fhnd.close();
-
-    return fstr;
-};
-
-void app::strtof(str p_txt, str p_fname) {
-    std::ofstream fhnd(p_fname);
-
-    fhnd << p_txt;
-};
-
-app::app(i32 argc, ch* argv[]) {
-    ioh = LUIC::iohandle (
-        "Trident Editor", 
-        LUIC_FLAGS_IOH_NOESCDELAY | LUIC_FLAGS_IOH_CLEARSCR
-    );
-
-    ioh .initthm (true);
-    //ioh .setttl  ("Trident Editor");
-    //ioh .setbody ("Made by LordOfTrident using NCurses\n\nControls:\n* Mouse - Everything\n* ESC - Menu bar\n* Arrows - Change navigate cursor/menu bar");
-
-    menubar = LUIC::topbar (
-        "TR-ED",
-        {
-            LUIC::option ("File", {
-                LUIC::suboption("New",     "CTRL+N"), 
-                LUIC::suboption("Load",    "CTRL+L"), 
-                LUIC::suboption("Save",    "CTRL+S"),
-                LUIC::suboption("Save As", ""),
-                LUIC::suboption("Exit",    "CTRL+Q")
-            }),
-
-            LUIC::option ("Edit", {
-                LUIC::suboption("Copy",  "CTRL+C"), 
-                LUIC::suboption("Cut",   "CTRL+X"),
-                LUIC::suboption("Paste", "CTRL+V")
-            }),
-
-            LUIC::option ("Tools", {
-                LUIC::suboption("ASCII Table", "CTRL+A")
-            }),
-
-            LUIC::option ("Help", {
-                LUIC::suboption("About", ""),
-                LUIC::suboption("Credits", "")
-            })
-        }
-    );
-
-    ioh.addchild(&menubar);
-
-    filemenu = LUIC::frame (
-        "Load File",
-        ioh.getwsizex() / 2 - 20,
-        ioh.getwsizey() / 2 - 5,
-        40,
-        10,
-        LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
-    );
-    filemenu .setvsble (false);
-    ioh .addchild (&filemenu);
-
-    filename = LUIC::textbar (
-        1, 
-        1, 
-        38,
-        0
-    );
-    filemenu .addchild (&filename);
-
-    filemsg = LUIC::label (
-        "",
-        2,
-        4,
-        0
-    );
-    filemenu .addchild (&filemsg);
-
-    fileclose = LUIC::button (
-        "Close",
-        filemenu.getszx() - 9,
-        filemenu.getszy() - 2,
-        9,
-        1,
-        0
-    );
-    filemenu .addchild (&fileclose);
-    
-    fileok = LUIC::button (
-        "Ok",
-        filemenu.getszx() - 19,
-        filemenu.getszy() - 2,
-        8,
-        1,
-        0
-    );
-    filemenu .addchild (&fileok);
-
-    sfilemenu = LUIC::frame (
-        "Save File As",
-        ioh.getwsizex() / 2 - 20,
-        ioh.getwsizey() / 2 - 5,
-        40,
-        10,
-        LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
-    );
-    sfilemenu .setvsble (false);
-    ioh .addchild (&sfilemenu);
-
-    sfilename = LUIC::textbar (
-        1, 
-        1, 
-        38,
-        0
-    );
-    sfilemenu .addchild (&sfilename);
-
-    sfilemsg = LUIC::label (
-        "",
-        2,
-        4,
-        0
-    );
-    sfilemenu .addchild (&sfilemsg);
-
-    sfileclose = LUIC::button (
-        "Close",
-        sfilemenu.getszx() - 9,
-        sfilemenu.getszy() - 2,
-        9,
-        1,
-        0
-    );
-    sfilemenu .addchild (&sfileclose);
-    
-    sfileok = LUIC::button (
-        "Ok",
-        sfilemenu.getszx() - 19,
-        sfilemenu.getszy() - 2,
-        8,
-        1,
-        0
-    );
-    sfilemenu .addchild (&sfileok);
-
-    crdtsframe = LUIC::frame (
-        "Credits",
-        ioh.getwsizex() / 2 - 15,
-        ioh.getwsizey() / 2 - 4,
-        30,
-        8,
-        LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
-    );
-    crdtsframe .setvsble (false);
-    ioh .addchild (&crdtsframe);
-
-    crdtslabel = LUIC::label (
-        "    Made By LordOfTrident\n        Using NCurses",
-        1,
-        2,
-        0
-    );
-    crdtsframe .addchild (&crdtslabel);
-
-    crdtsok = LUIC::button (
-        "Ok",
-        crdtsframe.getszx() / 2 - 4,
-        crdtsframe.getszy() - 2,
-        8,
-        1,
-        0
-    );
-    crdtsframe .addchild (&crdtsok);
-
-    atblframe = LUIC::frame(
-        "ASCII Table",
-        ioh.getwsizex() / 2 - 25,
-        ioh.getwsizey() / 2 - 11,
-        34,
-        8,
-        LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
-    );
-
-    atblframe .setvsble (false);
-    ioh .addchild (&atblframe);
-
-    ui8 posx = 0, posy = 0;
-    for (ui8 i = 0; i < 128; ++ i) {
-        if (i % 32 == 0) {
-            posx = 0;
-
-            ++ posy;
-        };
-
-        LUIC::button* btn = new LUIC::button(
-            i < 32 || i > 126? " " : str(1, i),
-            1 + posx,
-            posy,
-            1,
-            1,
-            0
-        );
-
-        btn->setcolschm ({
-            __LUIC__SHDWCLR,
-            __LUIC__WNDCLR,
-            __LUIC__SYSCLR,
-            __LUIC__WBACLR,
-            __LUIC__WBBCLR,
-            __LUIC__TXTCLR,
-            __LUIC__COMMON
-        });
-
-        atblbtns  .push_back (btn);
-        atblframe .addchild  (btn);
-
-        ++ posx;
-    };
-
-    atblline = LUIC::label (
-        str(32, ACS_HLINE),
-        1,
-        5,
-        LUIC_FLAGS_LBL_ALTCHARSET
-    );
-
-    atblline .setcolschm ({
-        __LUIC__WBACLR,
-        __LUIC__SHDWCLR
-    });
-
-    atblframe .addchild (&atblline);
-
-    atbllabel = LUIC::label(
-        "CH: - | CNTRL: - | DEC: -",
-        2,
-        6,
-        0
-    );
-
-    atblframe .addchild (&atbllabel);
-
-    scblframe = LUIC::frame(
-        "SCBL",
-        ioh.getwsizex() / 2 - 20,
-        ioh.getwsizey() / 2 - 4,
-        40,
-        8,
-        LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_CLOSABLE
-    );
-
-    ioh .addchild (&scblframe);
-
-    scblmsg = LUIC::label(
-        "",
-        1,
-        1,
-        0
-    );
-
-    scblframe. addchild (&scblmsg);
-
-    idx_linfcs = -1;
-    sfowagr    = false;
-
-    init_pair(__CEDIT_COL__DEF,     COLOR_WHITE,      COLOR_BLACK);
-    init_pair(__CEDIT_COL__DEF_GRN, COLOR_LIGHTGREEN, COLOR_BLACK);
-    init_pair(__CEDIT_COL__DEF_FRM, COLOR_WHITE,      COLOR_BLACK);
-
-    init_pair(__CEDIT_COL__KEYWORD, COLOR_WHITE, COLOR_LIGHTMAGENTA);
-    init_pair(__CEDIT_COL__STRING,  COLOR_WHITE, COLOR_LIGHTGREEN);
-    init_pair(__CEDIT_COL__NUMBER,  COLOR_WHITE, COLOR_CYAN);
-    init_pair(__CEDIT_COL__BOOLEAN, COLOR_WHITE, COLOR_MAGENTA);
-    init_pair(__CEDIT_COL__DATATYP, COLOR_WHITE, COLOR_LIGHTCYAN);
-    init_pair(__CEDIT_COL__STD,     COLOR_WHITE, COLOR_LIGHTYELLOW);
-    init_pair(__CEDIT_COL__COMMENT, COLOR_WHITE, COLOR_GREY);
-    init_pair(__CEDIT_COL__PREPROC, COLOR_WHITE, COLOR_LIGHTRED);
-
-    homedir = getenv("HOME");
-    #define STTNGS_DEFAULT "set tabsize 4;\nset color background black;\nset color foreground white;\nset color frame white;\nset color comment grey;\nset color keyword brightmagenta;\nset color string brightgreen;\nset color number cyan;\nset color boolean magenta;\nset color datatype brightcyan;\nset color std brightyellow;\nset color preproc brightred;"
-
-    if (!dexists (homedir + "/.config/tr-ed")) {
-        maked  (homedir + "/.config/tr-ed");
-        strtof (STTNGS_DEFAULT, homedir + "/.config/tr-ed/settings.scbl");
-    } else {
-        if (!fexists (homedir + "/.config/tr-ed/settings.scbl"))
-            strtof (STTNGS_DEFAULT, homedir + "/.config/tr-ed/settings.scbl");
-    };
-
-	SCBLi.AddConstant(SCBL::Constant("tabsize", SCBL_TABSIZE));
-	SCBLi.AddConstant(SCBL::Constant("color",   SCBL_COLOR));
-
-	SCBLi.AddConstant(SCBL::Constant("background", SCBL_BG));
-	SCBLi.AddConstant(SCBL::Constant("foreground", SCBL_FG));
-	SCBLi.AddConstant(SCBL::Constant("frame",      SCBL_FRAME));
-	SCBLi.AddConstant(SCBL::Constant("keyword",    SCBL_KEYWORD));
-	SCBLi.AddConstant(SCBL::Constant("string",     SCBL_STRING));
-	SCBLi.AddConstant(SCBL::Constant("number",     SCBL_NUMBER));
-	SCBLi.AddConstant(SCBL::Constant("boolean",    SCBL_BOOLEAN));
-	SCBLi.AddConstant(SCBL::Constant("datatype",   SCBL_DATATYPE));
-	SCBLi.AddConstant(SCBL::Constant("std",        SCBL_STD));
-	SCBLi.AddConstant(SCBL::Constant("comment",    SCBL_COMMENT));
-	SCBLi.AddConstant(SCBL::Constant("preproc",    SCBL_PREPROC));
-
-	SCBLi.AddConstant(SCBL::Constant("black",   COLOR_BLACK));
-	SCBLi.AddConstant(SCBL::Constant("red",     COLOR_RED));
-	SCBLi.AddConstant(SCBL::Constant("green",   COLOR_GREEN));
-	SCBLi.AddConstant(SCBL::Constant("yellow",  COLOR_YELLOW));
-	SCBLi.AddConstant(SCBL::Constant("blue",    COLOR_BLUE));
-	SCBLi.AddConstant(SCBL::Constant("magenta", COLOR_MAGENTA));
-	SCBLi.AddConstant(SCBL::Constant("cyan",    COLOR_CYAN));
-	SCBLi.AddConstant(SCBL::Constant("white",   COLOR_WHITE));
-
-	SCBLi.AddConstant(SCBL::Constant("grey",          COLOR_GREY));
-	SCBLi.AddConstant(SCBL::Constant("brightred",     COLOR_LIGHTRED));
-	SCBLi.AddConstant(SCBL::Constant("brightgreen",   COLOR_LIGHTGREEN));
-	SCBLi.AddConstant(SCBL::Constant("brightyellow",  COLOR_LIGHTYELLOW));
-	SCBLi.AddConstant(SCBL::Constant("brightblue",    COLOR_LIGHTBLUE));
-	SCBLi.AddConstant(SCBL::Constant("brightmagenta", COLOR_LIGHTMAGENTA));
-	SCBLi.AddConstant(SCBL::Constant("brightcyan",    COLOR_LIGHTCYAN));
-	SCBLi.AddConstant(SCBL::Constant("brightwhite",   COLOR_LIGHTWHITE));
-
-    SCBLi.AddFunction(SCBL::Function("set", [] (std::vector <uint32_t> Parameters) {
-        if (Parameters.size() < 2) {
-            scblerr = "Not enough parameters for 'set'";
+        if (phnd.IsOutOfParams()) {
+            app->__sscblerr("Not enough parameters for 'set'");
 
             return;
         };
 
-	    switch (Parameters[0]) {
-            case 0: {
-                // TODO: Change tab size
+        switch (arg) {
+            case SCBL_TABSIZE: {
+                arg = phnd.GetNextParamInt();
 
-                break;
-            };
+				if (arg < 1)
+					arg = 1;
 
-            case 1: {
-                if (Parameters.size() < 3) {
-                    scblerr = "Not enough parameters for 'set color'";
+                if (phnd.IsOutOfParams()) {
+                    app->__sscblerr("Not enough parameters for 'set tabsize'");
 
                     return;
                 };
 
-                switch (Parameters[1]) {
-                    case SCBL_BG: {
-                        editor_bg = Parameters[2];
+                app->__ssttng(SETTING_TABSIZE, {(ch)arg});
 
-                        init_pair(__CEDIT_COL__DEF,     editor_fg,        editor_bg);
-                        init_pair(__CEDIT_COL__DEF_GRN, COLOR_LIGHTGREEN, editor_bg);
+                break;
+            };
+
+			case SCBL_CURBLNK: {
+                arg = phnd.GetNextParamInt();
+
+                if (phnd.IsOutOfParams()) {
+                    app->__sscblerr("Not enough parameters for 'set cursorblink'");
+
+                    return;
+                };
+
+				app->__ssttng(SETTING_CURBLINK, {(bool)arg});
+
+				break;
+			};
+
+			case SCBL_THEME: {
+				str arg = phnd.GetNextParamStr();
+
+				if (phnd.IsOutOfParams()) {
+                    app->__sscblerr("Not enough parameters for 'set theme'");
+
+                    return;
+                };
+
+				str fullpath = app->__ghmdir() + "/.config/tr-ed/themes/" + arg + ".scbl";
+
+				if (not FS::Exists(fullpath) or FS::IsADirectory(fullpath)) {
+                    app->__sscblerr("'set theme' theme file\n'" + fullpath + "'\nnot found");
+
+                    return;
+                };
+
+				app->__ssttng(SETTING_THEMEFILE, fullpath);
+
+				break;
+			};
+        };
+    }));
+
+	RunSCBL(HomeDir + "/.config/tr-ed/settings.scbl");
+
+	SCBLi.SetFunction(SCBL::Function("set", [] (std::vector <ui8> Parameters, void* UserData) {
+        SCBL::ParameterHandler phnd(Parameters);
+        App *app = (App*)UserData;
+
+        ui8 arg = phnd.GetNextParam8();
+
+        if (phnd.IsOutOfParams()) {
+            app->__sscblerr("Not enough parameters for 'set'");
+
+            return;
+        };
+
+        switch (arg) {
+            case SCBL_COLOR: {
+                arg = phnd.GetNextParam8();
+                ui8 color = phnd.GetNextParam8();
+
+                if (phnd.IsOutOfParams()) {
+                    app->__sscblerr("Not enough parameters for 'set color'");
+
+                    return;
+                };
+
+                switch (arg) {
+                    case SCBL_BG: {
+						app->__sclr(SETTINGCOLOR_EDITORBG, color);
+
+                        init_pair(__CEDIT_COL__DEF, app->__gclr(SETTINGCOLOR_EDITORFG), app->__gclr(SETTINGCOLOR_EDITORBG));
 
                         break;
                     };
 
                     case SCBL_FG: {
-                        editor_fg = Parameters[2];
+						app->__sclr(SETTINGCOLOR_EDITORFG, color);
 
-                        init_pair(__CEDIT_COL__DEF, editor_fg, editor_bg);
-                        
+                        init_pair(__CEDIT_COL__DEF, app->__gclr(SETTINGCOLOR_EDITORFG), app->__gclr(SETTINGCOLOR_EDITORBG));
+
                         break;
                     };
 
                     case SCBL_FRAME: {
-                        init_pair(__CEDIT_COL__DEF_FRM, Parameters[2], editor_bg);
+						app->__sclr(SETTINGCOLOR_EDITORFRAMEFG, color);
+
+                        init_pair(__CEDIT_COL__DEF_FRM, app->__gclr(SETTINGCOLOR_EDITORFRAMEFG), app->__gclr(SETTINGCOLOR_EDITORFRAMEBG));
+
+                        break;
+                    };
+
+					case SCBL_FRAMEBG: {
+						app->__sclr(SETTINGCOLOR_EDITORFRAMEBG, color);
+
+                        init_pair(__CEDIT_COL__DEF_FRM, app->__gclr(SETTINGCOLOR_EDITORFRAMEFG), app->__gclr(SETTINGCOLOR_EDITORFRAMEBG));
+                        init_pair(__CEDIT_COL__DEF_GRN, COLOR_BRIGHTGREEN, app->__gclr(SETTINGCOLOR_EDITORFRAMEBG));
 
                         break;
                     };
@@ -411,204 +509,335 @@ app::app(i32 argc, ch* argv[]) {
                 break;
             };
         };
-	}));
+    }));
 
-    i16 cex = argc - 2, cey = 1;
-    for (ui8 i = 1; i < argc; ++ i) {
-        ceditors .push_back (ceditor (&ioh, argv[i], fexists(argv[i])? ftostr(argv[i]) : "", cex, cey, ioh.getwsizex() - cex, ioh.getwsizey() - cey));
-        filemenu .setvsble  (false);
-
-        -- cex;
-        ++ cey;
-
-        if (cex < 0) cex = argc - 2;
-        if (cey > ioh.getwsizey()) cey = 1;
-    };
-
-    scblok = SCBLi .Parse (ftostr(homedir + "/.config/tr-ed/settings.scbl"));
-    
-    if (scblok == SCBL_PARSER_OK) 
-        scblok = SCBLi .Run ();
-
-    if (scblok != SCBL_PARSER_OK) {
-        scblframe .setvsble (true);
-        scblframe .totop    ();
-
-        scblmsg.settxt("SCBL: " + scblerr + "\n" + SCBLi.GetErrorMsg());
-    } else 
-        scblframe .setvsble (false);
-
-    erase ();
+	RunSCBL(Settings[SETTING_THEMEFILE]);
 };
 
-void app::start() {
-    running = true;
+void App::Start() {
+	running = true;
 
-    while (running) {
-        ioh .draw  ();
-        ioh .input ();
+	while (running) {
+		IOH.Draw();
+		IOH.Input();
 
-        if (menubar.getsboptst(0) == 4) 
-            running = false;
-        else if (menubar.getsboptst(0) == 1) {
-            filemsg  .settxt ("Type in the file name");
-            filename .settxt ("");
+		switch (TopBar.GetChoice()) {
+			case 0: {
+				switch (TopBar.GetSubChoice()) {
+					case 0: {
+						CEditors.push_back(CEditor(
+							&IOH,
+							"Untitled",
+							"",
+							Settings
+						));
 
-            filemenu .setpos (ioh.getwsizex() / 2 - filemenu.getszx() / 2, ioh.getwsizey() / 2 - filemenu.getszy() / 2);
-            filemenu .totop  ();
+						IdxLastInFocus = CEditors.size() - 1;
 
-            filemenu .setvsble (true);
-        } else if (menubar.getsboptst(0) == 3) {
-            sfowagr = false;
+						CEditors[IdxLastInFocus].GetFrame()->SetFocus(true);
+						CEditors[IdxLastInFocus].GetEditor()->SetFocus(true);
 
-            sfilemsg  .settxt ("Type in the file name");
-            sfilename .settxt ("");
+						break;
+					};
 
-            sfilemenu .setpos (ioh.getwsizex() / 2 - sfilemenu.getszx() / 2, ioh.getwsizey() / 2 - sfilemenu.getszy() / 2);
-            sfilemenu .totop  ();
+					case 1: {
+						LFileMsg.SetText("Type in the file name");
+						LFileName.SetText("");
 
-            sfilemenu .setvsble (true);
-        } else if (menubar.getsboptst(0) == 2) {
-            if (idx_linfcs != -1) {
-                str fname = ceditors[idx_linfcs].getfname();
+						LFileMenu.SetPos(IOH.GetWindowSizeX() / 2 - LFileMenu.GetSizeX() / 2, IOH.GetWindowSizeY() / 2 - LFileMenu.GetSizeY() / 2);
+						LFileMenu.ToTop();
 
-                if (fexists(fname)) {
-                    strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
-                    ceditors[idx_linfcs] .gettxtbx () ->setmodif (false);
-                } else {
-                    sfowagr = false;
+						LFileMenu.SetVisible(true);
 
-                    sfilemsg  .settxt ("Type in the file name");
-                    sfilename .settxt ("");
+						break;
+					};
 
-                    sfilemenu .setpos (ioh.getwsizex() / 2 - sfilemenu.getszx() / 2, ioh.getwsizey() / 2 - sfilemenu.getszy() / 2);
-                    sfilemenu .totop  ();
+					case 2: {
+						if (IdxLastInFocus != -1) {
+							str fname = CEditors[IdxLastInFocus].GetFrameName();
 
-                    sfilemenu .setvsble (true);
-                };
-            };
-        } else if (menubar.getsboptst(2) == 0) {
-            atblframe .setpos   (ioh.getwsizex() / 2 - atblframe.getszx() / 2, ioh.getwsizey() / 2 - atblframe.getszy() / 2);
-            atblframe .totop    ();
+							if (FS::Exists(fname)) {
+								if (FS::IsADirectory(fname))
+									FS::Delete(fname);
 
-            atblframe .setvsble (true);
-        } else if (menubar.getsboptst(3) == 1) {
-            crdtsframe .setpos   (ioh.getwsizex() / 2 - crdtsframe.getszx() / 2, ioh.getwsizey() / 2 - crdtsframe.getszy() / 2);
-            crdtsframe .totop    ();
-            
-            crdtsframe .setvsble (true);
-        } else if (menubar.getsboptst(0) == 0) {
-            ceditors.push_back (ceditor (&ioh, "Untitled", ""));
+								FS::WriteFile(CEditors[IdxLastInFocus].GetEditor()->GetText(), fname);
+								CEditors[IdxLastInFocus].GetEditor()->SetModif(false);
+							} else {
+								SFile = false;
 
-            idx_linfcs = ceditors.size() - 1;
+								SFileMsg.SetText("Type in the file name");
+								SFileName.SetText("");
 
-            ceditors[idx_linfcs] .getfrm   ()->setfcs (true);
-            ceditors[idx_linfcs] .gettxtbx ()->setfcs (true);
-        } else if (fileclose.isclicked())
-            filemenu .setvsble (false);
-        else if (sfileclose.isclicked())
-            sfilemenu .setvsble (false);
-        else if (fileok.isclicked()) {
-            str fname = filename .gettxt ();
+								SFileMenu.SetPos(IOH.GetWindowSizeX() / 2 - SFileMenu.GetSizeX() / 2, IOH.GetWindowSizeY() / 2 - SFileMenu.GetSizeY() / 2);
+								SFileMenu.ToTop();
 
-            if (fname != "") {
-                if (fexists(fname)) {
-                    ceditors .push_back (ceditor (&ioh, fname, ftostr(fname)));
-                    filemenu .setvsble  (false);
-                } else
-                    filemsg .settxt    ("File '" + (
-                            fname.length() > 9? 
-                                fname.substr(0, 9) + "..." 
-                            : 
-                                fname
-                        ) + "' not found.\nType in the file name");
-            } else 
-                filemsg .settxt ("Type in the file name");
-        } else if (sfileok.isclicked()) {
-            if (idx_linfcs != -1) {
-                str fname = sfilename .gettxt ();
+								SFileMenu.SetVisible(true);
+							};
+						};
 
-                if (fname != "") {
-                    bool error = true;
-                    for (ui16 i = 0; i < fname.length(); ++ i)
-                        if (fname[i] != ' ' && fname[i] != '*') 
-                            error = false;
+						break;
+					};
 
-                    if (!error) {
-                        if (fexists(fname)) {
-                            if (sfowagr) {
-                                strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
-                                ceditors[idx_linfcs] .gettxtbx () ->setmodif (false);
+					case 3: {
+						SFile = false;
 
-                                ceditors[idx_linfcs] .setfname (fname);
+						SFileMsg.SetText("Type in the file name");
+						SFileName.SetText("");
 
-                                sfilemenu .setvsble (false);
+						SFileMenu.SetPos(IOH.GetWindowSizeX() / 2 - SFileMenu.GetSizeX() / 2, IOH.GetWindowSizeY() / 2 - SFileMenu.GetSizeY() / 2);
+						SFileMenu.ToTop();
 
-                                sfowagr = false;
-                            } else {
-                                sfilemsg .settxt ("File already exists, press ok if\nyou want to overwrite.");
+						SFileMenu.SetVisible(true);
 
-                                sfowagr = true;
-                            };
-                        } else {
-                            strtof (ceditors[idx_linfcs].gettxtbx()->gettxt(), fname);
-                            ceditors[idx_linfcs] .gettxtbx () ->setmodif (false);
-                            ceditors[idx_linfcs] .setfname (fname);
+						break;
+					};
 
-                            sfilemenu .setvsble (false);
-                        };
-                    } else
-                        sfilemsg .settxt ("File name contains invalid symbols");
-                } else 
-                    sfilemsg .settxt ("Type in the file name");
-            } else
-                sfilemsg .settxt ("Select the ceditor of which the\ncontents you want to save.");
-        } else if (crdtsok.isclicked())
-            crdtsframe .setvsble (false);
+					case 4: {
+						running = false;
 
-        atbllabel .settxt ("CH: - | CNTRL: - | DEC: -");
-        for (ui8 i = 0; i < (ui8)atblbtns.size(); ++ i) {
-            LUIC::button* btn = (LUIC::button*)atblbtns[i];
+						break;
+					};
+				};
 
-            if (btn->lstinfcs()) {
-                atbllabel .settxt ("CH: " + (i < 32 || i > 126? "-" : str(1, i)) + " | CNTRL: " + (i < 32 || i > 126? "Y" : "N") + " | DEC: " + std::to_string(i));
+				break;
+			};
 
-                break;
-            };
-        };
+			case 1: {
+				switch (TopBar.GetSubChoice()) {
 
-        for (i16 i = 0; i < (i16)ceditors.size(); ++ i) {
-            LUIC::frame* ceditfrm = ceditors[i].getfrm();
-            ceditfrm->setflags(LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE);
+				};
 
-            if (ceditfrm->getposx() + ceditfrm->getszx() == ioh.getwsizex())
-                ceditfrm->setflags(ceditfrm->getflags() | LUIC_FLAGS_COMPONENT_SCALEDX);
+				break;
+			};
 
-            if (ceditfrm->getposy() + ceditfrm->getszy() == ioh.getwsizey())
-                ceditfrm->setflags(ceditfrm->getflags() | LUIC_FLAGS_COMPONENT_SCALEDY);
+			case 2: {
+				switch (TopBar.GetSubChoice()) {
+					case 0: {
+						ASCIITableFrame.SetPos(IOH.GetWindowSizeX() / 2 - ASCIITableFrame.GetSizeX() / 2, IOH.GetWindowSizeY() / 2 - ASCIITableFrame.GetSizeY() / 2);
+						ASCIITableFrame.ToTop();
 
-            if (!ceditors[i].getfrm()->getvsble()) {
-                ceditors[i] .cleanup ();
-                ceditors .erase (ceditors .begin () + i);
+						ASCIITableFrame.SetVisible(true);
 
-                if (idx_linfcs == i) 
-                    idx_linfcs = -1;
+						break;
+					};
 
-                -- i;
+					case 1: {
+						Defaults();
+						ReadConfig();
 
-                continue;
-            };
+						break;
+					};
+				};
 
-            if (ceditors[i].getfrm()->lstinfcs())
-                idx_linfcs = i;
-        };
-    };
+				break;
+			};
 
-    for (i16 i = 0; i < (i16)ceditors.size(); ++ i) {
-        ceditors[i] .cleanup ();
-    };
+			case 3: {
+				switch (TopBar.GetSubChoice()) {
+					case 0: {
 
-    for (ui8 i = 0; i < (ui8)atblbtns.size(); ++ i) {
-        delete (LUIC::button*)atblbtns[i];
-    };
+						break;
+					};
+
+					case 1: {
+						CreditsFrame.SetPos(IOH.GetWindowSizeX() / 2 - CreditsFrame.GetSizeX() / 2, IOH.GetWindowSizeY() / 2 - CreditsFrame.GetSizeY() / 2);
+						CreditsFrame.ToTop();
+
+						CreditsFrame.SetVisible(true);
+
+						break;
+					};
+				};
+
+				break;
+			}
+		};
+
+		if (LFileClose.IsClicked())
+			LFileMenu.SetVisible(false);
+		else if (SFileClose.IsClicked())
+			SFileMenu.SetVisible(false);
+		else if (LFileOk.IsClicked()) {
+			str fname = LFileName.GetText();
+
+			if (fname != "") {
+				if (fname[0] == '~')
+					fname = HomeDir + fname.substr(1);
+
+				if (FS::Exists(fname) and not FS::IsADirectory(fname)) {
+					CEditors.push_back(CEditor(
+						&IOH,
+						fname,
+						FS::ReadFile(fname),
+						Settings
+					));
+					LFileMenu.SetVisible(false);
+				} else
+					LFileMsg.SetText("File '" + (fname.length() > 9? fname.substr(0, 9) + "..." : fname) + "' not found.\nType in the file name");
+			} else
+				LFileMsg.SetText("Type in the file name");
+		} else if (SFileOk.IsClicked()) {
+			if (IdxLastInFocus != -1) {
+				str fname = SFileName.GetText();
+
+				if (fname != "") {
+					if (fname[0] == '~')
+						fname = HomeDir + fname.substr(1);
+
+					bool error = true;
+					for (ui16 i = 0; i < fname.length(); ++ i)
+						if (fname[i] != ' ' and fname[i] != '*')
+							error = false;
+
+					if (not error) {
+						if (FS::Exists(fname)) {
+							if (SFile) {
+								FS::WriteFile(CEditors[IdxLastInFocus].GetEditor()->GetText(), fname);
+								CEditors[IdxLastInFocus].GetEditor() ->SetModif (false);
+
+								CEditors[IdxLastInFocus].SetFrameName(fname);
+
+								SFileMenu.SetVisible(false);
+
+								SFile = false;
+							} else {
+								SFileMsg.SetText("File already exists, press ok if\nyou want to overwrite.");
+
+								SFile = true;
+							};
+						} else {
+							FS::WriteFile(CEditors[IdxLastInFocus].GetEditor()->GetText(), fname);
+							CEditors[IdxLastInFocus].GetEditor() ->SetModif(false);
+							CEditors[IdxLastInFocus].SetFrameName(fname);
+
+							SFileMenu.SetVisible(false);
+						};
+					} else
+						SFileMsg.SetText("File name contains invalid symbols");
+				} else
+					SFileMsg.SetText("Type in the file name");
+			} else
+				SFileMsg.SetText("Select the editor of which the\ncontents you want to save.");
+		} else if (CreditsOk.IsClicked())
+			CreditsFrame.SetVisible(false);
+
+		ASCIITableLabel.SetText("CH: - | CNTRL: - | DEC: -");
+		for (ui8 i = 0; i < (ui8)ASCIITableButtons.size(); ++ i) {
+			LUIC::Button* btn = (LUIC::Button*)ASCIITableButtons[i];
+
+			if (btn->IsLastInFocus()) {
+				ASCIITableLabel.SetText("CH: " + (i < 32 or i > 126? "-" : str(1, i)) + " | CNTRL: " + (i < 32 or i > 126? "Y" : "N") + " | DEC: " + std::to_string(i));
+
+				break;
+			};
+		};
+
+		for (i16 i = 0; i < (i16)CEditors.size(); ++ i) {
+			LUIC::Frame* ceditfrm = CEditors[i].GetFrame();
+			ceditfrm->SetFlags(LUIC_FLAGS_FRM_CLOSABLE | LUIC_FLAGS_FRM_DRAGGABLE | LUIC_FLAGS_FRM_RESIZABLE);
+
+			if (ceditfrm->GetPosX() + ceditfrm->GetSizeX() == IOH.GetWindowSizeX())
+				ceditfrm->SetFlags(ceditfrm->GetFlags() | LUIC_FLAGS_COMPONENT_SCALEDX);
+
+			if (ceditfrm->GetPosY() + ceditfrm->GetSizeY() == IOH.GetWindowSizeY())
+				ceditfrm->SetFlags(ceditfrm->GetFlags() | LUIC_FLAGS_COMPONENT_SCALEDY);
+
+			if (not CEditors[i].GetFrame()->GetVisible()) {
+				CEditors[i].Cleanup();
+				CEditors.erase(CEditors.begin() + i);
+
+				if (IdxLastInFocus == i)
+					IdxLastInFocus = -1;
+
+				-- i;
+
+				continue;
+			};
+
+			if (CEditors[i].GetFrame()->IsLastInFocus())
+				IdxLastInFocus = i;
+		};
+	};
+
+	for (i16 i = 0; i < (i16)CEditors.size(); ++ i)
+		CEditors[i].Cleanup();
+
+	for (ui8 i = 0; i < (ui8)ASCIITableButtons.size(); ++ i)
+		delete (LUIC::Button*)ASCIITableButtons[i];
+};
+
+void App::CreateOrFixPath(str p_Path) {
+	if (not FS::IsADirectory(p_Path))
+		FS::Delete(p_Path);
+
+	if (not FS::Exists(p_Path))
+		FS::CreateDirectory(p_Path);
+};
+
+void App::CreateOrFixPath(str p_Path, str p_Contents) {
+	if (FS::IsADirectory(p_Path))
+		FS::Delete(p_Path);
+
+	if (not FS::Exists(p_Path))
+		FS::WriteFile(p_Contents, p_Path);
+};
+
+void App::RunSCBL(str p_Path) {
+	if (SCBLOk != SCBL_RUNTIME_OK)
+		return;
+
+	SCBLOk = SCBLi.Parse(FS::ReadFile(p_Path));
+
+	if (SCBLOk == SCBL_PARSER_OK)
+		SCBLOk = SCBLi.Run();
+
+	str scblframedesc = "SCBL: ";
+	bool showscblfrm = false;
+
+	if (SCBLError != "") {
+		scblframedesc += SCBLError + "\n";
+		showscblfrm = true;
+	};
+
+	if (SCBLOk != SCBL_RUNTIME_OK) {
+		scblframedesc += SCBLi.GetErrorMsg();
+		showscblfrm = true;
+	};
+
+	if (showscblfrm) {
+		SCBLMsg.SetText(scblframedesc);
+
+		SCBLFrame.SetVisible(true);
+		SCBLFrame.ToTop();
+	} else
+		SCBLFrame.SetVisible(false);
+};
+
+void App::__sscblerr(str p_SCBLError) {
+	SCBLError = p_SCBLError;
+};
+
+str App::__ghmdir() {
+	return HomeDir;
+};
+
+void App::__ssttng(ui8 p_SettingIdx, str p_Value) {
+	while (p_SettingIdx >= (ui8)Settings.size())
+		Settings.push_back("");
+
+	Settings[p_SettingIdx] = p_Value;
+};
+;
+void App::__sclr(ui8 p_ColorIdx, ui8 p_Value) {
+	while (p_ColorIdx >= (ui8)Colors.size())
+		Colors.push_back(0);
+
+	Colors[p_ColorIdx] = p_Value;
+};
+
+ui8 App::__gclr(ui8 p_ColorIdx) {
+	if (p_ColorIdx > (ui8)Colors.size())
+		return 0;
+
+	return Colors[p_ColorIdx];
 };

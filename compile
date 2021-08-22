@@ -2,13 +2,19 @@
 
 printf "\e[0;36m* CMPL: \e[0;33mCreating ./bin/\n\e[0m";
 mkdir -p bin
-printf "\e[0;36m* CMPL: \e[0;33mChecking if g++ is installed\n\e[0m"
-sudo apt install g++
-printf "\e[0;36m* CMPL: \e[0;33mChecking if required libraries are installed\n\e[0m"
-sudo apt-get install libncurses5-dev libncursesw5-dev;
+if [ "$1" != "-nc" ]; then
+    if [ "$(grep -Ei 'debian|buntu|mint' /etc/*release)" ]; then
+        printf "\e[0;36m* CMPL: \e[0;33mChecking if g++ is installed\n\e[0m"
+        sudo apt install g++
+        printf "\e[0;36m* CMPL: \e[0;33mChecking if required libraries are installed\n\e[0m"
+        sudo apt-get install libncurses5-dev libncursesw5-dev;
+    else
+        printf "\e[0;36m* CMPL: \e[0;33mYour distro is not debian-based, please make sure you have g++ and ncurses, ncursesw libraries installed.\n\e[0m"
+    fi
+fi
 printf "\e[0;36m* CMPL: \e[0;33mCompiling...\n\e[0m";
 
-if g++ -g src/*.cc -o bin/tr-ed -O3 -s -Wall -std=c++17 -lncursesw; then
+if g++ -g src/*.cc -o bin/tr-ed -O3 -s -Wall -std=c++17 -lstdc++fs -lncursesw; then
     printf "\e[0;36m* CMPL: \e[0;32mCompiled Succesfully\n";
 
     printf "\e[0;36m* CMPL: \e[0;33mCopying binary "tr-ed" to /usr/bin...\n\e[0m";

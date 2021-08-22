@@ -11,13 +11,13 @@
 
 #define __LUIC__SHDWCLR 247
 
-#define __LUIC__WNDCLR  250
-#define __LUIC__WNDDEF  249
-#define __LUIC__WNDGRN  245
-#define __LUIC__SYSGRN  207
-#define __LUIC__BCKGRN  208
-#define __LUIC__WBACLR  240
-#define __LUIC__WBBCLR  230
+#define __LUIC__WNDCLR 250
+#define __LUIC__WNDDEF 249
+#define __LUIC__WNDGRN 245
+#define __LUIC__SYSGRN 207
+#define __LUIC__BCKGRN 208
+#define __LUIC__WBACLR 240
+#define __LUIC__WBBCLR 230
 
 #define __LUIC__HGLTCLR 251
 #define __LUIC__BTNCLR  252
@@ -40,58 +40,52 @@
 #define LUIC_TYPE_EDITOR  "editor"
 
 namespace LUIC {
-    class iohandle {
-    public:
+	class IOHandle {
+	public:
+		IOHandle();
+		IOHandle(str p_Title, flags p_Flags);
 
-        iohandle ();
-        iohandle (str p_ttl, flags p_flags);
+		~IOHandle();
 
-        ~iohandle ();
+		void Draw();
+		i16 Input();
 
-        void draw  ();
-        i16  input ();
+		void AddColor(ui8 p_ID, color p_Background, color p_Foreground);
+		void AddChild(Component* p_child);
+		i16 GetChild(Component* p_child);
+		void RemoveChild(ui16 p_Idx);
+		void PushBackChild(Component* p_child);
 
-        void addclr   (ui8 p_id, color p_bg, color p_fg);
-        void addchild (component* p_child);
-        i16  getchild (component* p_child);
-        void remchild (ui16 p_idx);
-        void pbchild  (component* p_child);
+		ui16 GetWindowSizeX();
+		ui16 GetWindowSizeY();
 
-        ui16 getwsizex ();
-        ui16 getwsizey ();
+		void InitTheme(bool p_Shadow);
 
-        void initthm (bool p_shdw);
+		void SetFlags(flags p_Flags);
+		void SetTitle(str p_Title);
+		void SetBody(str p_Body);
 
-        void setflgs (flags p_flags);
-        void setttl  (str p_ttl);
-        void setbody (str p_body);
+		word GetTick();
 
-        bool __hasshdw    ();
+		bool __hasshdw();
 
-        bool __gchldfcsed ();
-        void __schldfcsed (bool p_fcsed);
+		bool __gchldfcsed();
+		void __schldfcsed(bool p_Focused);
 
-        ui32 gettick();
+	private:
+		Component* WindowTopBar;
 
-    private:
+		vector <Component*> Children;
 
-        component* wndtopbar;
+		ui16 WindowSizeX, WindowSizeY;
 
-        vector <component*> children;
+		bool Shadow, ChildFocused;
 
-        ui16 wsizex,
-             wsizey;
+		ui16 XPrevious, YPrevious;
 
-        bool shdw,
-             chldfcsed;
+		str Title, Body;
+		flags Flags;
 
-        ui16 xprev, 
-             yprev;
-
-        str   ttl,
-              body;
-        flags flgs;
-
-        ui32 tick;
-    };
+		word Tick;
+	};
 };

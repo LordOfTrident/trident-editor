@@ -2,6 +2,9 @@
 
 #include "_COMPONENTS"
 #include "_COLORS"
+#include "_DEFAULTS"
+#include "_SCBL"
+#include "_SETTINGS"
 #include "types.hh"
 #include "iohandle.hh"
 #include "frame.hh"
@@ -12,77 +15,67 @@
 #include "editor.hh"
 #include "ceditor.hh"
 #include "scbl.hh"
+#include "fs.hh"
 
-#define SCBL_TABSIZE 0
-#define SCBL_COLOR   1
+class App {
+public:
+	App();
+	App(i32 argc, ch* argv[]);
 
-#define SCBL_BG    100
-#define SCBL_FG    101
-#define SCBL_FRAME 102
+	void Start();
 
-#define SCBL_KEYWORD  103
-#define SCBL_STRING   104
-#define SCBL_NUMBER   105
-#define SCBL_BOOLEAN  106
-#define SCBL_DATATYPE 107
-#define SCBL_STD      108
-#define SCBL_COMMENT  109
-#define SCBL_PREPROC  110
-
-extern str scblerr;
-
-class app {
-public: 
-
-    app ();
-    app (i32 argc, ch* argv[]);
-
-    void start ();
+	void __sscblerr(str p_SCBLError);
+	str __ghmdir();
+	void __ssttng(ui8 p_SettingIdx, str p_Value);
+	void __sclr(ui8 p_ColorIdx, ui8 p_Value);
+	ui8 __gclr(ui8 p_ColorIdx);
 
 private:
+	void CreateOrFixPath(str p_Path);
+	void CreateOrFixPath(str p_Path, str p_Contents);
+	void RunSCBL(str p_Path);
 
-    bool dexists (str p_name);
-    void maked   (str p_name);
+	void Defaults();
+	void InitSCBL();
+	void ReadConfig();
 
-    bool fexists (str p_name);
-    str  ftostr  (str p_fname);
-    void strtof  (str p_txt, str p_fname);
+	bool running;
 
-    bool running;
-    i8   scblok;
+	i8 SCBLOk;
+	str SCBLError;
 
-    SCBL::SCBL_Interpreter SCBLi;
+	SCBL::SCBL_Interpreter SCBLi;
 
-    str homedir;
+	str HomeDir;
 
-    LUIC::iohandle ioh;
-    LUIC::topbar   menubar;
+	std::vector <str> Settings;
+	std::vector <ui8> Colors;
 
-    LUIC::frame   filemenu;
-    LUIC::textbar filename;
-    LUIC::button  fileclose,
-                  fileok;
-    LUIC::label   filemsg;
+	LUIC::IOHandle IOH;
+	LUIC::TopBar TopBar;
 
-    bool sfowagr;
-    LUIC::frame   sfilemenu;
-    LUIC::textbar sfilename;
-    LUIC::button  sfileclose,
-                  sfileok;
-    LUIC::label   sfilemsg; 
+	LUIC::Frame LFileMenu;
+	LUIC::TextBar LFileName;
+	LUIC::Button LFileClose, LFileOk;
+	LUIC::Label LFileMsg;
 
-    LUIC::frame  crdtsframe;
-    LUIC::label  crdtslabel;
-    LUIC::button crdtsok;
+	bool SFile;
+	LUIC::Frame SFileMenu;
+	LUIC::TextBar SFileName;
+	LUIC::Button SFileClose, SFileOk;
+	LUIC::Label SFileMsg;
 
-    LUIC::frame atblframe;
-    LUIC::label atbllabel,
-                atblline;
-    vector <LUIC::component*> atblbtns;
+	LUIC::Frame CreditsFrame;
+	LUIC::Label CreditsLabel;
+	LUIC::Button CreditsOk;
 
-    LUIC::frame scblframe;
-    LUIC::label scblmsg;
+	LUIC::Frame ASCIITableFrame;
+	LUIC::Label ASCIITableLabel, ASCIITableLine;
+	vector <LUIC::Component*> ASCIITableButtons;
 
-    vector <ceditor> ceditors;
-    i8               idx_linfcs;
+	LUIC::Frame SCBLFrame;
+	LUIC::Label SCBLMsg;
+
+	vector <CEditor> CEditors;
+	i8 IdxLastInFocus;
 };

@@ -1,0 +1,77 @@
+#define STTNGS_DEFAULT "\
+{*\n\
+ *\n\
+ *  Trident Editor settings file\n\
+ *  ============================\n\
+ *\n\
+ *  If you mess something up and want the default settings back,\n\
+ *  just delete this file and tr-ed will make a new one.\n\
+ *\n\
+ *}\n\
+\n\
+set tabsize 4;\n\
+# You can find all themes under ./themes folder\n\
+# and even make your own.\n\
+set theme \"default\";\n\
+set cursorblink true;\n\
+"
+
+#define THEME_DEFAULT "\
+set color background      black;\n\
+set color foreground      white;\n\
+set color frameforeground white;\n\
+set color framebackground black;\n\
+set color comment         grey;\n\
+set color operators       red;\n\
+set color keyword         brightmagenta;\n\
+set color string          brightgreen;\n\
+set color number          cyan;\n\
+set color boolean         magenta;\n\
+set color datatype        brightcyan;\n\
+set color std             brightyellow;\n\
+"
+
+#define THEME_CLASSIC "\
+set color background      blue;\n\
+set color foreground      brightwhite;\n\
+set color frameforeground brightcyan;\n\
+set color framebackground blue;\n\
+set color comment         grey;\n\
+set color operators       red;\n\
+set color keyword         brightmagenta;\n\
+set color string          brightgreen;\n\
+set color number          cyan;\n\
+set color boolean         magenta;\n\
+set color datatype        brightcyan;\n\
+set color std             brightyellow;\n\
+"
+
+#define THEME_LIGHT "\
+set color background      brightwhite;\n\
+set color foreground      black;\n\
+set color frameforeground blue;\n\
+set color framebackground brightwhite;\n\
+set color comment         grey;\n\
+set color operators       red;\n\
+set color keyword         brightmagenta;\n\
+set color string          brightgreen;\n\
+set color number          cyan;\n\
+set color boolean         magenta;\n\
+set color datatype        brightcyan;\n\
+set color std             brightyellow;\n\
+"
+
+#define THEME_BUBBLEGUM "\
+set color background      magenta;\n\
+set color foreground      brightwhite;\n\
+set color frameforeground white;\n\
+set color framebackground magenta;\n\
+set color comment         grey;\n\
+set color operators       red;\n\
+set color keyword         brightmagenta;\n\
+set color string          brightgreen;\n\
+set color number          cyan;\n\
+set color boolean         magenta;\n\
+set color datatype        brightcyan;\n\
+set color std             brightyellow;\n\
+"

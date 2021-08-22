@@ -7,56 +7,48 @@
 #include "component.hh"
 #include "iohandle.hh"
 
-#define LUIC_TOPBAR_OPTNOTCHOSEN -1
-
 namespace LUIC {
-    class suboption {
-    public:
+	class SubOption {
+	public:
+		SubOption();
+		SubOption(str p_Name, str p_Keybind);
 
-        suboption ();
-        suboption (str p_name, str p_kb);
+		str Name, Keybind;
+	};
 
-        str          name,
-                     keybind;
-    };
+	class Option {
+	public:
+		Option();
+		Option(str p_Name, vector <SubOption> p_SubOptions);
 
-    class option {
-    public:
+		str Name;
+		vector <SubOption> SubOptions;
+	};
 
-        option ();
-        option (str p_name, vector <suboption> p_subopts);
+	class TopBar: public Component {
+	public:
+		TopBar();
+		TopBar(str p_Title, vector <Option> p_Options);
 
-        str name;
-        vector <suboption> subopts;
-    };
+		virtual void Draw();
+		virtual void Input(i16 p_Input, MEVENT* p_Event);
 
-    class topbar: public component {
-    public:
+		void SetTitle(str p_Title);
 
-        topbar ();
-        topbar (str p_ttl, vector <option> p_options);
+		i8 GetChoice();
+		i8 GetSubChoice();
 
-        virtual void draw  ();
-        virtual void input (i16 p_in, MEVENT* p_evt);
+	private:
+		str Title;
+		bool Pressed;
+		Window OWnd;
 
-        void setttl     (str p_ttl);
-        i8   getsboptst (ui8 p_idx);
+		i16 Over, SubOver, Choice, SubChoice;
 
-    private:
+		vector <Option> Options;
 
-        str    ttl;
-        bool   prsd;
-        window ownd;
-
-        i16 ovr,
-            subovr,
-            chc,
-            subchc;
-
-        vector <option> options;
-
-        ch  walker_sprites[4];
-        i16 walker;
-        i8  walker_state;
-    };
+		ch WalkerSprites[4];
+		i16 Walker;
+		i8 WalkerState;
+	};
 };

@@ -1,139 +1,149 @@
 #include "textbar.hh"
 
-LUIC::textbar::textbar() {};
+LUIC::TextBar::TextBar() {};
 
-LUIC::textbar::textbar(ui16 p_posx, ui16 p_posy, ui16 p_szx, flags p_flags):
-    txt    (""),
-    prsd   (false),
-    curpos (0),
-    scrx   (0)
+LUIC::TextBar::TextBar(ui16 p_PosX, ui16 p_PosY, ui16 p_SizeX, flags p_Flags):
+	Text(""),
+	Pressed(false),
+	CurPos(0),
+	ScrollX(0)
 {
-    type = LUIC_TYPE_TEXTBAR;
-    flgs = p_flags;
-    
-    posx = p_posx;
-    posy = p_posy;
+	Type = LUIC_TYPE_TEXTBAR;
+	Flags = p_Flags;
 
-    wnd = window (posx, posy, p_szx, 3);
+	PosX = p_PosX;
+	PosY = p_PosY;
+
+	Wnd = Window(PosX, PosY, p_SizeX, 3);
 };
 
-void LUIC::textbar::settxt(str p_txt) {
-    txt = p_txt;
+void LUIC::TextBar::SetText(str p_Text) {
+	Text = p_Text;
 
-    curpos = 0;
-    scrx = 0;
+	CurPos = 0;
+	ScrollX = 0;
 };
 
-str LUIC::textbar::gettxt() {
-    return txt;
+str LUIC::TextBar::GetText() {
+	return Text;
 };
 
-void LUIC::textbar::draw() {
-    if (ioh == NULL || !vsble) return;
+void LUIC::TextBar::Draw() {
+	if (IOH == NULL or not Visible)
+		return;
 
-    if (parent == NULL) wnd .drawshdw (__LUIC__SHDWCLR);
+	if (Parent == NULL)
+		Wnd.DrawShadow(__LUIC__SHDWCLR);
 
-    if (prsd)       wnd .setbgclr (__LUIC__SYSCLR);
-    else if (infcs) wnd .setbgclr (__LUIC__TXTCLR);
-    else            wnd .setbgclr (__LUIC__TXTNFCS);
+	if (Pressed)
+		Wnd.SetBackgroundColor(__LUIC__SYSCLR);
+	else if (InFocus)
+		Wnd.SetBackgroundColor(__LUIC__TXTCLR);
+	else
+		Wnd.SetBackgroundColor(__LUIC__TXTNFCS);
 
-    wnd .outat (1, 1, txt.substr(scrx, wnd.getszx() - 2));
-   
-    if (infcs) {
-        wnd .setdbbrdr (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
-        
-        wnd .setattr (A_REVERSE, true);
-        wnd .setclr  (__LUIC__SYSCLR);
+	Wnd.OutAt(1, 1, Text.substr(ScrollX, Wnd.GetSizeX() - 2));
 
-        if (curpos == txt.length())
-            wnd .outat (curpos - scrx + 1, 1, " ");
-        else
-            wnd .outat (curpos - scrx + 1, 1, str(1, txt[curpos]));
-        
-        wnd .setattr (A_REVERSE, false);
-    } else       wnd .setbrdr   (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
+	if (InFocus) {
+		Wnd.SetDBBorder(0, 0, Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
+
+		Wnd.SetAttribute(A_REVERSE, true);
+		Wnd.SetColor(__LUIC__SYSCLR);
+
+		if (CurPos == Text.length())
+			Wnd.OutAt(CurPos - ScrollX + 1, 1, " ");
+		else
+			Wnd.OutAt(CurPos - ScrollX + 1, 1, str(1, Text[CurPos]));
+
+		Wnd.SetAttribute(A_REVERSE, false);
+	} else
+		Wnd.SetBorder(0, 0, Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
 };
 
-void LUIC::textbar::input(i16 p_in, MEVENT* p_evt) {
-    if (ioh == NULL || !vsble) return;
+void LUIC::TextBar::Input(i16 p_Input, MEVENT* p_Event) {
+	if (IOH == NULL or not Visible)
+		return;
 
-    switch (p_in) {
-        case KEY_MOUSE: {
-            if (p_evt->bstate & BUTTON1_RELEASED) {
-                if (prsd)
-                    prsd  = false;
-            } else if (p_evt->bstate & BUTTON1_PRESSED) {
-                if (ioh->__gchldfcsed()) return;
+	switch (p_Input) {
+		case KEY_MOUSE: {
+			if (p_Event->bstate & BUTTON1_RELEASED) {
+				if (Pressed)
+					Pressed = false;
+			} else if (p_Event->bstate & BUTTON1_PRESSED) {
+				if (IOH->__gchldfcsed())
+					return;
 
-                if (!(p_evt->x >= wnd .getposx () && 
-                      p_evt->y >= wnd .getposy () && 
-                    
-                      p_evt->x < wnd .getszx () + wnd .getposx () && 
-                      p_evt->y < wnd .getszy () + wnd .getposy ())) {
-                    infcs = false;
-                    
-                    break;
-                };
-                
-                prsd  = true;
-                infcs = true;
+				bool PosCheck = p_Event->x >= Wnd.GetPosX() and p_Event->y >= Wnd.GetPosY();
+				bool BRCornerCheck = p_Event->x < Wnd.GetSizeX() + Wnd.GetPosX() and p_Event->y < Wnd.GetSizeY() + Wnd.GetPosY();
 
-                ioh->__schldfcsed (false);
-                __fcsprnts ();
-            };
+				if (not (PosCheck and BRCornerCheck)) {
+					InFocus = false;
 
-            break;
-        };
+					break;
+				};
 
-        case 10: {
-            infcs = false;
+				Pressed = true;
+				InFocus = true;
 
-            break;
-        };
+				IOH->__schldfcsed(false);
+				__fcsprnts();
+			};
 
-        case KEY_BACKSPACE: {
-            if (!infcs)      break;
-            if (curpos == 0) break;
+			break;
+		};
 
-            txt.erase(curpos - 1, 1);
-            -- curpos;
+		case 10: {
+			InFocus = false;
 
-            break;
-        };
+			break;
+		};
 
-        case KEY_LEFT: {
-            if (!infcs)      break;
-            if (curpos == 0) break;
+		case 127: case KEY_BACKSPACE: {
+			if (CurPos == 0 or not InFocus)
+				break;
 
-            -- curpos;
+			Text.erase(CurPos - 1, 1);
+			-- CurPos;
 
-            break;
-        };
+			break;
+		};
 
-        case KEY_RIGHT: {
-            if (!infcs)                 break;
-            if (curpos == txt.length()) break;
+		case KEY_LEFT: {
+			if (CurPos == 0 or not InFocus)
+				break;
 
-            ++ curpos;
+			-- CurPos;
 
-            break;
-        };
+			break;
+		};
 
-        default: {
-            if (!infcs)                  break;
-            if (p_in < 32 || p_in > 126) break;
+		case KEY_RIGHT: {
+			if (CurPos == Text.length() or not InFocus)
+				break;
 
-            txt.insert(curpos, str(1, p_in));
+			++ CurPos;
 
-            ++ curpos;
+			break;
+		};
 
-            break;
-        };
-    };
+		default: {
+			if (not InFocus)
+				break;
 
-    if ((i16)curpos - (i16)scrx >= wnd.getszx() - 3) 
-        scrx = curpos - (wnd.getszx() - 3);
-    
-    if ((i16)curpos - (i16)scrx < 0) 
-        scrx =  curpos;
+			if (p_Input < 32 or p_Input > 126)
+				break;
+
+			Text.insert(CurPos, str(1, p_Input));
+
+			++ CurPos;
+
+			break;
+		};
+	};
+
+	if ((i16)CurPos - (i16)ScrollX >= Wnd.GetSizeX() - 3)
+		ScrollX = CurPos - (Wnd.GetSizeX() - 3);
+
+	if ((i16)CurPos - (i16)ScrollX < 0)
+		ScrollX =  CurPos;
 };

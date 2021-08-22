@@ -9,83 +9,74 @@
 #include "iohandle.hh"
 
 namespace LUIC {
-    class component {
-    public:
+	class Component {
+	public:
+		Component();
 
-        component ();
+		virtual void Draw() = 0;
+		virtual void Input(i16 p_Input, MEVENT* p_Event) = 0;
 
-        virtual void draw  () = 0;
-        virtual void input (i16 p_in, MEVENT* p_evt) = 0;
+		void SetParent(Component* p_Parent);
+		void SetIOHandle(IOHandle* p_IOH);
 
-        void setparent (component* p_parent);
-        void setioh    (iohandle* p_ioh);
+		Component* GetParent();
+		IOHandle* GetIOHandle();
 
-        component* getparent ();
-        iohandle*  getioh    ();
+		void AddChild(Component* p_Child);
+		i16 GetChild(Component* p_Child);
+		void RemoveChild(ui16 p_Idx);
+		void PushBackChild(Component* p_Child);
 
-        void addchild (component* p_child);
-        i16  getchild (component* p_child);
-        void remchild (ui16 p_idx);
-        void pbchild  (component* p_child);
+		void SetFocus(bool p_Focus);
+		bool IsInFocus();
 
-        void setfcs  (bool p_fcs);
-        bool isinfcs ();
+		void ToTop();
 
-        void totop ();
+		void SetVisible(bool p_Visible);
+		bool GetVisible();
 
-        void setvsble (bool p_vsble);
-        bool getvsble ();
+		void SetPos(i16 p_PosX, i16 p_PosY);
+		ui16 GetPosX();
+		ui16 GetPosY();
 
-        void setpos  (i16 p_posx, i16 p_posy);
-        ui16 getposx ();
-        ui16 getposy ();
+		void SetSize(i16 p_SizeX, i16 p_SizeY);
+		ui16 GetSizeX();
+		ui16 GetSizeY();
 
-        void setsz   (i16 p_szx, i16 p_szy);
-        ui16 getszx  ();
-        ui16 getszy  ();
+		void SetColorscheme(colors p_ColorScheme);
+		colors GetColorscheme();
 
-        void   setcolschm(colors p_colorscheme);
-        colors getcolschm();
+		str GetType();
 
-        str gettype ();
+		void SetFlags(flags p_Flags);
+		flags GetFlags();
 
-        void  setflags (flags p_flags);
-        flags getflags ();
+		bool IsLastInFocus();
 
-        bool lstinfcs ();
-        
-        void setinset (bool p_on);
-        bool getinset ();
+		void SetInset(bool p_On);
+		bool GetInset();
 
-        void  __sttlps  (ui16 p_posx, ui16 p_posy);
-        ui16 __gttlpsx ();
-        ui16 __gttlpsy ();
+		void __sttlps(ui16 p_PosX, ui16 p_PosY);
+		ui16 __gttlpsx();
+		ui16 __gttlpsy();
 
-        void __fcsprnts ();
-        void __fxps     ();
+		void __fcsprnts();
+		void __fxps();
 
-        window* __gwndacs ();
+		Window* __gwndacs();
 
-    protected:
+	protected:
+		str Type;
 
-        str type;
+		vector <Component*> Children;
 
-        vector <component*> children;
+		IOHandle* IOH;
+		Component* Parent;
+		Window Wnd;
 
-        iohandle*  ioh;
-        component* parent;
-        window     wnd;
-
-        ui16 posx,
-             posy;
-
-        colors colorscheme;
-
-        bool infcs,
-             vsble,
-             linfcs,
-             inset;
-
-        flags flgs;
-    };
+		ui16 PosX, PosY;
+		colors ColorScheme;
+		bool InFocus, Visible, LastInFocus, Inset;
+		flags Flags;
+	};
 };

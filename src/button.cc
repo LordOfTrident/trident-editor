@@ -1,111 +1,115 @@
 #include "button.hh"
 
-LUIC::button::button() {};
+LUIC::Button::Button() {};
 
-LUIC::button::button(str p_txt, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags):
-    txt    (p_txt),
-    prsd   (false),
-    clck   (false)
+LUIC::Button::Button(str p_Text, ui16 p_PosX, ui16 p_PosY, ui16 p_SizeX, ui16 p_SizeY, flags p_Flags):
+	Text(p_Text),
+	Pressed(false),
+	Click(false)
 {
-    type = LUIC_TYPE_BUTTON;
-    flgs = p_flags;
-    colorscheme = {
-        __LUIC__SHDWCLR,
-        __LUIC__WNDCLR,
-        __LUIC__SYSCLR,
-        __LUIC__WBACLR,
-        __LUIC__WBBCLR,
-        __LUIC__BTNPCLR,
-        __LUIC__HGHLGHT
-    };
-    
-    posx = p_posx;
-    posy = p_posy;
+	Type = LUIC_TYPE_BUTTON;
+	Flags = p_Flags;
+	ColorScheme = {
+		__LUIC__SHDWCLR,
+		__LUIC__WNDCLR,
+		__LUIC__SYSCLR,
+		__LUIC__WBACLR,
+		__LUIC__WBBCLR,
+		__LUIC__BTNPCLR,
+		__LUIC__HGHLGHT
+	};
 
-    wnd = window (posx, posy, p_szx, p_szy);
+	PosX = p_PosX;
+	PosY = p_PosY;
+
+	Wnd = Window(PosX, PosY, p_SizeX, p_SizeY);
 };
 
-void LUIC::button::settxt(str p_txt) {
-    txt = p_txt;
+void LUIC::Button::SetText(str p_Text) {
+	Text = p_Text;
 };
 
-bool LUIC::button::isclicked() {
-    if (clck) {
-        clck = false;
-        return true;
-    } else
-        return false;
+bool LUIC::Button::IsClicked() {
+	if (Click) {
+		Click = false;
+
+		return true;
+	} else
+		return false;
 };
 
-void LUIC::button::draw() {
-    if (ioh == NULL || !vsble) return;
+void LUIC::Button::Draw() {
+	if (IOH == NULL or not Visible)
+		return;
 
-    if (parent == NULL) wnd .drawshdw (colorscheme[0]);
+	if (Parent == NULL)
+		Wnd.DrawShadow(ColorScheme[0]);
 
-    
-    if (wnd.getszy() > 2) {
-        wnd .setbgclr (colorscheme[1]);
+	if (Wnd.GetSizeY() > 2) {
+		Wnd.SetBackgroundColor(ColorScheme[1]);
 
-        if (prsd)
-            wnd .setdbbrdr (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[3], colorscheme[4]);
-        else 
-            wnd .setbrdr   (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[3], colorscheme[4]);
+		if (Pressed)
+			Wnd.SetDBBorder(0, 0, Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, ColorScheme[3], ColorScheme[4]);
+		else
+			Wnd.SetBorder(0, 0, Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, ColorScheme[3], ColorScheme[4]);
 
-        if (linfcs)
-            wnd .setclr (colorscheme[2]);
+		if (LastInFocus)
+			Wnd.SetColor(ColorScheme[2]);
 
-        wnd .outat (1, wnd.getszy() / 2, str(wnd.getszx() - 2, ' '));
-        wnd .outat (wnd.getszx() / 2 - txt.length() / 2, wnd.getszy() / 2, txt);
-    } else {
-        if (prsd)
-            wnd .setbgclr (colorscheme[2]);
-        else if (linfcs)
-            wnd .setbgclr (colorscheme[5]);
-        else 
-            wnd .setbgclr (colorscheme[6]);
+		Wnd.OutAt(1, Wnd.GetSizeY() / 2, str(Wnd.GetSizeX() - 2, ' '));
+		Wnd.OutAt(Wnd.GetSizeX() / 2 - Text.length() / 2, Wnd.GetSizeY() / 2, Text);
+	} else {
+		if (Pressed)
+			Wnd.SetBackgroundColor(ColorScheme[2]);
+		else if (LastInFocus)
+			Wnd.SetBackgroundColor(ColorScheme[5]);
+		else
+			Wnd.SetBackgroundColor(ColorScheme[6]);
 
-        wnd .outat (wnd.getszx() / 2 - txt.length() / 2, wnd.getszy() / 2, txt);
-    };
+		Wnd.OutAt(Wnd.GetSizeX() / 2 - Text.length() / 2, Wnd.GetSizeY() / 2, Text);
+	};
 };
 
-void LUIC::button::input(i16 p_in, MEVENT* p_evt) {
-    if (ioh == NULL || !vsble) return;
-    
-    clck = false;
+void LUIC::Button::Input(i16 p_Input, MEVENT* p_Event) {
+	if (IOH == NULL or not Visible)
+		return;
 
-    switch (p_in) {
-        case KEY_MOUSE: {
-            if (p_evt->bstate & BUTTON1_RELEASED) {
-                if (prsd) {
-                    prsd  = false;
-                    clck  = true;
-                    infcs = false;
-                };
-            } else if (p_evt->bstate & BUTTON1_PRESSED) {
-                if (ioh->__gchldfcsed()) return;
+	Click = false;
 
-                if (!(p_evt->x >= wnd .getposx () && 
-                      p_evt->y >= wnd .getposy () && 
-                    
-                      p_evt->x < wnd .getszx () + wnd .getposx () && 
-                      p_evt->y < wnd .getszy () + wnd .getposy ())) {
-                    linfcs = false;
-                    
-                    break;
-                };
-                     
-                prsd   = true;
-                infcs  = false;
-                linfcs = true;
+	switch (p_Input) {
+		case KEY_MOUSE: {
+			if (p_Event->bstate & BUTTON1_RELEASED) {
+				if (Pressed) {
+					Pressed = false;
+					Click = true;
+					InFocus = false;
+				};
+			} else if (p_Event->bstate & BUTTON1_PRESSED) {
+				if (IOH->__gchldfcsed()) return;
 
-                ioh->__schldfcsed (true);
-                __fcsprnts ();
+				bool PosCheck = p_Event->x >= Wnd.GetPosX() and p_Event->y >= Wnd.GetPosY();
+				bool BRCornerCheck = p_Event->x < Wnd.GetSizeX() + Wnd.GetPosX() and p_Event->y < Wnd.GetSizeY() + Wnd.GetPosY();
 
-                if (parent == NULL) ioh->pbchild(this);
-                else parent->pbchild(this);
-            };
+				if (not (PosCheck and BRCornerCheck)) {
+					LastInFocus = false;
 
-            break;
-        };
-    };
+					break;
+				};
+
+				Pressed = true;
+				InFocus = false;
+				LastInFocus = true;
+
+				IOH->__schldfcsed(true);
+				__fcsprnts();
+
+				if (Parent == NULL)
+					IOH->PushBackChild(this);
+				else
+					Parent->PushBackChild(this);
+			};
+
+			break;
+		};
+	};
 };

@@ -1,0 +1,19 @@
+#define SCBL_TABSIZE 0
+#define SCBL_COLOR   1
+#define SCBL_THEME   2
+#define SCBL_CURBLNK 3
+
+#define SCBL_BG      100
+#define SCBL_FG      101
+#define SCBL_FRAME   102
+#define SCBL_FRAMEBG 103
+
+#define SCBL_KEYWORD  104
+#define SCBL_STRING   105
+#define SCBL_NUMBER   106
+#define SCBL_BOOLEAN  107
+#define SCBL_DATATYPE 108
+#define SCBL_STD      109
+#define SCBL_COMMENT  110
+#define SCBL_PREPROC  111
+#define SCBL_OPERATOR 112

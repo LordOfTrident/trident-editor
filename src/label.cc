@@ -1,81 +1,85 @@
 #include "label.hh"
 
-LUIC::label::label() {};
+LUIC::Label::Label() {};
 
-LUIC::label::label(str p_txt, ui16 p_posx, ui16 p_posy, flags p_flags):
-    txt (p_txt)
+LUIC::Label::Label(str p_Text, ui16 p_PosX, ui16 p_PosY, flags p_Flags):
+	Text(p_Text)
 {
-    type = LUIC_TYPE_LABEL;
-    flgs = p_flags;
-    colorscheme = {
-        __LUIC__COMMON,
-        __LUIC__SHDWCLR
-    };
-    
-    posx = p_posx;
-    posy = p_posy;
-    
-    ui16 szx = 0;
-    ui16 szy = 1;
+	Type = LUIC_TYPE_LABEL;
+	Flags = p_Flags;
+	ColorScheme = {
+		__LUIC__COMMON,
+		__LUIC__SHDWCLR
+	};
 
-    ui16 pos = 0;
-    for (ui16 i = 0; i < txt.length(); ++ i) {
-        if (txt[i] == 10) {
-            ++ szy;
+	PosX = p_PosX;
+	PosY = p_PosY;
 
-            if (szx < i - pos + 1) szx = i - pos;
+	ui16 SizeX = 0;
+	ui16 SizeY = 1;
 
-            pos = i;
-        };
-    };
+	ui16 pos = 0;
+	for (ui16 i = 0; i < Text.length(); ++ i) {
+		if (Text[i] == 10) {
+			++ SizeY;
 
-    if (szx < txt.length() - pos + 1) szx = txt.length() - pos;
+			if (SizeX < i - pos + 1) SizeX = i - pos;
 
-    wnd = window (posx, posy, szx, szy);
+			pos = i;
+		};
+	};
+
+	if (SizeX < Text.length() - pos + 1)
+		SizeX = Text.length() - pos;
+
+	Wnd = Window(PosX, PosY, SizeX, SizeY);
 };
 
+void LUIC::Label::SetText(str p_Text) {
+	Text = p_Text;
 
-void LUIC::label::settxt(str p_txt) {
-    txt = p_txt;
+	ui16 SizeX = 0;
+	ui16 SizeY = 1;
 
-    ui16 szx = 0;
-    ui16 szy = 1;
+	ui16 pos = 0;
 
-    ui16 pos = 0;
-    for (ui16 i = 0; i < txt.length(); ++ i) {
-        if (txt[i] == 10) {
-            ++ szy;
+	for (ui16 i = 0; i < Text.length(); ++ i) {
+		if (Text[i] == 10) {
+			++ SizeY;
 
-            if (szx < i - pos + 1) szx = i - pos;
+			if (SizeX < i - pos + 1) SizeX = i - pos;
 
-            pos = i;
-        };
-    };
+			pos = i;
+		};
+	};
 
-    if (szx < txt.length() - pos + 1) szx = txt.length() - pos;
+	if (SizeX < Text.length() - pos + 1)
+		SizeX = Text.length() - pos;
 
-    wnd .setsz (szx, szy);
+	Wnd.SetSize(SizeX, SizeY);
 };
 
-void LUIC::label::draw() {
-    if (ioh == NULL || !vsble) return;
+void LUIC::Label::Draw() {
+	if (IOH == NULL or not Visible)
+		return;
 
-    if (parent == NULL) wnd .drawshdw (colorscheme[1]);
+	if (Parent == NULL)
+		Wnd.DrawShadow(ColorScheme[1]);
 
-    wnd .setbgclr (colorscheme[0]);
+	Wnd.SetBackgroundColor(ColorScheme[0]);
 
-    bool altcharset = false;
-    
-    if (flgs & LUIC_FLAGS_LBL_ALTCHARSET) {
-        altcharset = true;
+	bool altcharset = false;
 
-        wnd .setattr (A_ALTCHARSET, true);
-    };
-    
-    wnd .outat (0, 0, txt);
-    
-    if (altcharset)
-        wnd .setattr (A_ALTCHARSET, false);
+	if (Flags & LUIC_FLAGS_LBL_ALTCHARSET) {
+		altcharset = true;
+
+		Wnd.SetAttribute(A_ALTCHARSET, true);
+	};
+
+	Wnd.OutAt(0, 0, Text);
+
+	if (altcharset)
+		Wnd.SetAttribute(A_ALTCHARSET, false);
 };
 
-void LUIC::label::input(i16 p_in, MEVENT* p_evt) {};
+void LUIC::Label::Input(i16 p_Input, MEVENT* p_Event) {};

@@ -8,22 +8,19 @@
 #include "iohandle.hh"
 
 namespace LUIC {
-    class button: public component {
-    public:
+	class Button: public Component {
+	public:
+		Button();
+		Button(str p_Text, ui16 p_PosX, ui16 p_PosY, ui16 p_SizeX, ui16 p_SizeY, flags p_Flags);
 
-        button ();
-        button (str p_txt, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags);
+		virtual void Draw();
+		virtual void Input(i16 p_Input, MEVENT* p_Event);
 
-        virtual void draw  ();
-        virtual void input (i16 p_in, MEVENT* p_evt);
+		void SetText(str p_Text);
+		bool IsClicked();
 
-        void settxt    (str p_txt);
-        bool isclicked ();
-
-    private:
-
-        str   txt;
-        bool  prsd,
-              clck;
-    };
+	private:
+		str Text;
+		bool Pressed, Click;
+	};
 };

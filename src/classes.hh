@@ -1,11 +1,11 @@
 #pragma once
 
 namespace LUIC {
-    class iohandle;
-    class component;
-    class frame;
-    class button;
-    class topbar;
-    class textbar;
-    class textbox;
+	class IOHandle;
+	class Component;
+	class Frame;
+	class Button;
+	class TopBar;
+	class TextBar;
+	class Editor;
 };

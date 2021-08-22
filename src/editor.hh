@@ -9,40 +9,37 @@
 #include "iohandle.hh"
 
 namespace LUIC {
-    class editor: public component {
+    class Editor: public Component {
     public:
+        Editor();
+        Editor(ui16 p_posx, ui16 p_posy, ui16 p_SizeX, ui16 p_SizeY, flags p_flags);
 
-        editor ();
-        editor (ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags);
+        virtual void Draw();
+        virtual void Input(i16 p_in, MEVENT* p_evt);
 
-        virtual void draw  ();
-        virtual void input (i16 p_in, MEVENT* p_evt);
+        void SetText(str p_Text);
+        str GetText();
 
-        void settxt (str p_txt);
-        str  gettxt ();
+        void SetFT(str p_FT);
+        str GetFT();
 
-        void setft (str p_ft);
-        str  getft ();
+        void SetModif(bool p_Modif);
+        bool GetModif();
 
-        void setmodif (bool p_m);
-        bool getmodif ();
+        void SetTitle(str p_ttl);
+        str GetTitle();
 
-        void setttl (str p_ttl);
-        str  getttl ();
+        void SetTabSize(ui8 p_tabsize);
+        ui8 GetTabSize();
+
+        str __shptxtbuf(str p_Text, ui32 p_X, ui32 p_Y, ui32 p_SizeX, ui32 p_SizeY);
 
     private:
+        str Text, FT, Title;
 
-        str txt,
-            ft,
-            ttl;
+        bool Pressed, Modif, CurRender;
 
-        bool prsd,
-             modif;
-
-        ui32 curpos,
-             curx,
-             cury,
-             scrx,
-             scry;
+        ui32 CurPos, CurX, CurY, ScrollX, ScrollY, CurOff, HigherLinePos;
+        ui8 TabSize;
     };
 };

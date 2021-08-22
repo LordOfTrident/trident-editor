@@ -1,187 +1,206 @@
 #include "frame.hh"
 
-LUIC::frame::frame() {};
+LUIC::Frame::Frame() {};
 
-LUIC::frame::frame(str p_ttl, ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags):
-    ttl    (" " + p_ttl + " "),
-    prsd   (false),
-    clse   (false),
-    drg    (false),
-    rsz    (false)
+LUIC::Frame::Frame(str p_Title, ui16 p_PosX, ui16 p_PosY, ui16 p_SizeX, ui16 p_SizeY, flags p_Flags):
+	Title(" " + p_Title + " "),
+	Pressed(false),
+	Close(false),
+	Drag(false),
+	Resize(false)
 {
-    type = LUIC_TYPE_FRAME;
-    flgs = p_flags;
+	Type = LUIC_TYPE_FRAME;
+	Flags = p_Flags;
 
-    colorscheme = {
-        __LUIC__SHDWCLR,
-        __LUIC__WBACLR,
-        __LUIC__WBBCLR,
-        __LUIC__WNDGRN,
-        __LUIC__SYSCLR,
-        __LUIC__WNDCLR
-    };
- 
-    posx = p_posx;
-    posy = p_posy;
+	ColorScheme = {
+		__LUIC__SHDWCLR,
+		__LUIC__WBACLR,
+		__LUIC__WBBCLR,
+		__LUIC__WNDGRN,
+		__LUIC__SYSCLR,
+		__LUIC__WNDCLR
+	};
 
-    wnd = window (posx, posy, p_szx, p_szy);
+	PosX = p_PosX;
+	PosY = p_PosY;
+
+	Wnd = Window(PosX, PosY, p_SizeX, p_SizeY);
 };
 
-void LUIC::frame::setttl(str p_ttl) {
-    ttl = " " + p_ttl + " ";
+void LUIC::Frame::SetTitle(str p_Title) {
+	Title = " " + p_Title + " ";
 };
 
-str LUIC::frame::getttl() {
-    return ttl.substr(1, ttl.length() - 2);
+str LUIC::Frame::GetTitle() {
+	return Title.substr(1, Title.length() - 2);
 };
 
-void LUIC::frame::draw() {
-    if (ioh == NULL || !vsble) return;
+void LUIC::Frame::Draw() {
+	if (IOH == NULL or not Visible)
+		return;
 
-    if (parent == NULL) wnd .drawshdw (colorscheme[0]);
+	if (Parent == NULL)
+		Wnd.DrawShadow(ColorScheme[0]);
 
-    wnd .setbgclr (colorscheme[5]);
+	Wnd.SetBackgroundColor(ColorScheme[5]);
 
-    if (prsd) wnd .setdbbrdr (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[1], colorscheme[2]);
-    else      wnd .setbrdr   (0, 0, wnd.getszx() - 1, wnd.getszy() - 1, colorscheme[1], colorscheme[2]);
+	if (Pressed)
+		Wnd.SetDBBorder(0, 0, Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, ColorScheme[1], ColorScheme[2]);
+	else
+		Wnd.SetBorder(0, 0, Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, ColorScheme[1], ColorScheme[2]);
 
-    str fttl = (i32)ttl.length() > (wnd .getszx() - 8)? ttl.substr(0, wnd .getszx() - 11) + "... " : ttl;
-    wnd .outat (wnd.getszx() / 2 - fttl.length() / 2, 0, fttl);
+	str fTitle = (i32)Title.length() > (Wnd .GetSizeX() - 8)? Title.substr(0, Wnd .GetSizeX() - 11) + "... " : Title;
+	Wnd.OutAt(Wnd.GetSizeX() / 2 - fTitle.length() / 2, 0, fTitle);
 
-    if (flgs & LUIC_FLAGS_FRM_CLOSABLE) {
-        wnd .outatclr (wnd .getszx() - 4, 0, "[ ]", colorscheme[1]);
-        if (!clse) wnd .setattr (A_BLINK, true);
-        if (clse)  wnd .wchoutatclr (wnd .getszx() - 3, 0, WACS_S7,      colorscheme[3]);
-        else       wnd .wchoutatclr (wnd .getszx() - 3, 0, WACS_DIAMOND, colorscheme[3]);
-        if (!clse) wnd .setattr (A_BLINK, false);
-    };
+	if (Flags & LUIC_FLAGS_FRM_CLOSABLE) {
+		Wnd.OutAt(Wnd.GetSizeX() - 4, 0, "[ ]", ColorScheme[1]);
 
-    if (flgs & LUIC_FLAGS_FRM_RESIZABLE) {
-        if (rsz) wnd .setclr (colorscheme[4]);
-        else     wnd .setclr (colorscheme[5]);
+		if (Close)
+			Wnd.OutAt(Wnd.GetSizeX() - 3, 0, WACS_S7, ColorScheme[3]);
+		else {
+			Wnd.SetAttribute(A_BLINK, true);
+			Wnd.OutAt(Wnd.GetSizeX() - 3, 0, WACS_DIAMOND, ColorScheme[3]);
+			Wnd.SetAttribute(A_BLINK, false);
+		};
+	};
 
-        wnd .outat (wnd .getszx () - 1, wnd .getszy () - 1, "+");
-    };
+	if (Flags & LUIC_FLAGS_FRM_RESIZABLE) {
+		if (Resize)
+			Wnd.SetColor(ColorScheme[4]);
+		else
+			Wnd.SetColor(ColorScheme[5]);
 
-    for (ui16 i = 0; i < (ui16)children.size(); ++ i) {
-        children[i]->draw();
-    };
+		Wnd.OutAt(Wnd.GetSizeX() - 1, Wnd.GetSizeY() - 1, "+");
+	};
+
+	for (ui16 i = 0; i < (ui16)Children.size(); ++ i)
+		Children[i]->Draw();
 };
 
-void LUIC::frame::input(i16 p_in, MEVENT* p_evt) {
-    if (ioh == NULL || !vsble) return;
+void LUIC::Frame::Input(i16 p_Input, MEVENT* p_Event) {
+	if (IOH == NULL or not Visible)
+		return;
 
-    for (i16 i = (i16)children.size() - 1; i >= 0; -- i) {
-        component* child = children[i];
-        child->input (p_in, p_evt);
+	for (i16 i = (i16)Children.size() - 1; i >= 0; -- i) {
+		Component* Child = Children[i];
+		Child->Input(p_Input, p_Event);
 
-        if (child != children[i]) -- i;
+		if (Child != Children[i])
+			-- i;
 
-        if (child->getflags() & LUIC_FLAGS_COMPONENT_SCALED) {} else {
-            if (child->getszx() + 2 > wnd.getszx())
-                wnd.setsz(child->getszx() + 2, wnd.getszy());
+		bool Scaled = Child->GetFlags() & LUIC_FLAGS_COMPONENT_SCALED;
 
-            if (child->getszy() + 2 > wnd.getszy())
-                wnd.setsz(wnd.getszx(), child->getszy() + 2);
-        };
+		if (not Scaled) {
+			if (Child->GetSizeX() + 2 > Wnd.GetSizeX())
+				Wnd.SetSize(Child->GetSizeX() + 2, Wnd.GetSizeY());
 
-        if (child->isinfcs ()) {
-            if (ioh->__gchldfcsed ()) child->setfcs (false);
-            else ioh->__schldfcsed(true);
-        };
-    };
+			if (Child->GetSizeY() + 2 > Wnd.GetSizeY())
+				Wnd.SetSize(Wnd.GetSizeX(), Child->GetSizeY() + 2);
+		};
 
-    switch (p_in) {
-        case KEY_RESIZE: {
-            __fxps ();
+		if (Child->IsInFocus()) {
+			if (IOH->__gchldfcsed ())
+				Child->SetFocus(false);
+			else
+				IOH->__schldfcsed(true);
+		};
+	};
 
-            break;
-        };
-        
-        case KEY_MOUSE: {
-            if (p_evt->bstate & BUTTON1_RELEASED) {
-                if (prsd) {
-                    prsd  = false;
-                    infcs = false;
+	switch (p_Input) {
+		case KEY_RESIZE: {
+			__fxps();
 
-                    if (flgs & LUIC_FLAGS_FRM_DRAGGABLE) {
-                        if (parent != NULL) setpos (p_evt->x - parent->getposx () - offstx, p_evt->y - parent->getposy () - offsty);
-                        else                setpos (p_evt->x - offstx, p_evt->y - offsty);
+			break;
+		};
 
-                        __fxps ();
-                    };
-                } else if (clse) {
-                    clse  = false;
-                    vsble = false;
-                    infcs = false;
-                } else if (rsz) {
-                    rsz   = false;
-                    infcs = false;
+		case KEY_MOUSE: {
+			if (p_Event->bstate & BUTTON1_RELEASED) {
+				if (Pressed) {
+					Pressed = false;
+					InFocus = false;
 
-                    i16 newszx = p_evt->x - wnd.getposx() + 1, 
-                        newszy = p_evt->y - wnd.getposy() + 1;
+					if (Flags & LUIC_FLAGS_FRM_DRAGGABLE) {
+						if (Parent != NULL)
+							SetPos(p_Event->x - Parent->GetPosX() - OffsetX, p_Event->y - Parent->GetPosY() - OffsetY);
+						else
+							SetPos(p_Event->x - OffsetX, p_Event->y - OffsetY);
 
-                    if (newszx < 20) newszx = 20;
-                    if (newszy < 5)  newszy = 5;
+						__fxps();
+					};
+				} else if (Close) {
+					Close = false;
+					Visible = false;
+					InFocus = false;
+				} else if (Resize) {
+					Resize = false;
+					InFocus = false;
 
-                    setsz (newszx, newszy);
-                };
-            } else if (p_evt->bstate & BUTTON1_PRESSED) {
-                if (!(p_evt->x >= wnd .getposx () && 
-                      p_evt->y >= wnd .getposy () && 
-                    
-                      p_evt->x < wnd .getszx () + wnd .getposx () && 
-                      p_evt->y < wnd .getszy () + wnd .getposy ())) {
-                    linfcs = false;
-                    
-                    break;
-                };
+					i16 newSizeX = p_Event->x - Wnd.GetPosX() + 1;
+					i16 newSizeY = p_Event->y - Wnd.GetPosY() + 1;
 
-                if (ioh->__gchldfcsed()) return;
+					if (newSizeX < 20)
+						newSizeX = 20;
 
-                if (flgs & LUIC_FLAGS_FRM_CLOSABLE) {
-                    if (p_evt->x == wnd .getszx () + wnd .getposx () - 3 &&
-                        p_evt->y == wnd .getposy ()) {
-                        clse   = true;
-                        infcs  = true;
-                        linfcs = true;
+					if (newSizeY < 5)
+						newSizeY = 5;
 
-                        break;
-                    };
-                };
+					SetSize(newSizeX, newSizeY);
+				};
+			} else if (p_Event->bstate & BUTTON1_PRESSED) {
+				bool PosCheck = p_Event->x >= Wnd.GetPosX() and p_Event->y >= Wnd.GetPosY();
+				bool BRCornerCheck = p_Event->x < Wnd.GetSizeX() + Wnd.GetPosX() and p_Event->y < Wnd.GetSizeY() + Wnd.GetPosY();
 
-                if (flgs & LUIC_FLAGS_FRM_RESIZABLE) {
-                    if (p_evt->x == wnd .getszx () + wnd .getposx () - 1 &&
-                        p_evt->y == wnd .getszy () + wnd .getposy () - 1) {
-                        rsz    = true;
-                        infcs  = true;
-                        linfcs = true;
+				if (not (PosCheck and BRCornerCheck)) {
+					LastInFocus = false;
 
-                        break;
-                    };
-                };
-                
-                prsd  = true;
-                infcs = false;
-                linfcs = true;
+					break;
+				};
 
-                ioh->__schldfcsed (true);
-                __fcsprnts ();
+				if (IOH->__gchldfcsed()) return;
 
-                if (flgs & LUIC_FLAGS_FRM_DRAGGABLE) {
-                    offstx = p_evt->x - wnd .getposx ();
-                    offsty = p_evt->y - wnd .getposy ();
-                };
+				if (Flags & LUIC_FLAGS_FRM_CLOSABLE) {
+					if (p_Event->x == Wnd.GetSizeX() + Wnd.GetPosX() - 3 and p_Event->y == Wnd.GetPosY()) {
+						Close = true;
+						InFocus = true;
+						LastInFocus = true;
 
-                if (parent == NULL) ioh->pbchild(this);
-                else parent->pbchild(this);
-            };
+						break;
+					};
+				};
 
-            break;
-        };
-    };
+				if (Flags & LUIC_FLAGS_FRM_RESIZABLE) {
+					if (p_Event->x == Wnd.GetSizeX() + Wnd.GetPosX() - 1 and p_Event->y == Wnd.GetSizeY() + Wnd.GetPosY() - 1) {
+						Resize = true;
+						InFocus = true;
+						LastInFocus = true;
 
-    if (parent == NULL)
-        if (posy < 1)
-            setpos (getposx (), 1);
+						break;
+					};
+				};
+
+				Pressed = true;
+				InFocus = false;
+				LastInFocus = true;
+
+				IOH->__schldfcsed(true);
+				__fcsprnts();
+
+				if (Flags & LUIC_FLAGS_FRM_DRAGGABLE) {
+					OffsetX = p_Event->x - Wnd.GetPosX();
+					OffsetY = p_Event->y - Wnd.GetPosY();
+				};
+
+				if (Parent == NULL)
+					IOH->PushBackChild(this);
+				else
+					Parent->PushBackChild(this);
+			};
+
+			break;
+		};
+	};
+
+	if (Parent == NULL)
+		if (PosY < 1)
+			SetPos(GetPosX(), 1);
 };

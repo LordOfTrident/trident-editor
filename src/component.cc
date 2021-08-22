@@ -1,207 +1,222 @@
 #include "component.hh"
 
-LUIC::component::component():
-    infcs  (false),
-    vsble  (true),
-    linfcs (false),
-    inset  (true)
+LUIC::Component::Component():
+	InFocus(false),
+	Visible(true),
+	LastInFocus(false),
+	Inset(true),
+	Flags(0)
 {};
 
-void LUIC::component::setparent(component* p_parent) {
-    parent = p_parent;
+void LUIC::Component::SetParent(Component* p_Parent) {
+	Parent = p_Parent;
 
-    if (parent == NULL)
-        wnd .setpos (posx, posy);
-    else {
-        if (posx < 1) posx = 1;
-        if (posy < 1) posy = 1;
+	if (Parent == NULL)
+		Wnd.SetPos(PosX, PosY);
+	else {
+		if (PosX < 1) PosX = 1;
+		if (PosY < 1) PosY = 1;
 
-        if (posx > parent->getszx () - wnd .getszx () - 1) posx = parent->getszx () - wnd .getszx () - 1;
-        if (posy > parent->getszy () - wnd .getszy () - 1) posy = parent->getszy () - wnd .getszy () - 1;
+		if (PosX > Parent->GetSizeX() - Wnd.GetSizeX() - 1) PosX = Parent->GetSizeX() - Wnd.GetSizeX() - 1;
+		if (PosY > Parent->GetSizeY() - Wnd.GetSizeY() - 1) PosY = Parent->GetSizeY() - Wnd.GetSizeY() - 1;
 
-        wnd .setpos (parent->__gttlpsx () + posx, parent->__gttlpsy () + posy);
+		Wnd.SetPos(Parent->__gttlpsx() + PosX, Parent->__gttlpsy() + PosY);
 
-        if (flgs & LUIC_FLAGS_COMPONENT_SCALED) {
-            setsz  (parent->getszx() - 2, parent->getszy() - 2);
-            setpos (1, 1);
-        };
-    };
+		if (Flags & LUIC_FLAGS_COMPONENT_SCALED) {
+			SetSize(Parent->GetSizeX() - 2, Parent->GetSizeY() - 2);
+			SetPos(1, 1);
+		};
+	};
 };
 
-void LUIC::component::setcolschm(colors p_colorscheme) {
-    colorscheme = p_colorscheme;
+void LUIC::Component::SetColorscheme(colors p_ColorScheme) {
+	ColorScheme = p_ColorScheme;
 };
 
-colors LUIC::component::getcolschm() {
-    return colorscheme;
+colors LUIC::Component::GetColorscheme() {
+	return ColorScheme;
 };
 
-void LUIC::component::setioh(iohandle* p_ioh) {
-    ioh = p_ioh;
+void LUIC::Component::SetIOHandle(IOHandle* p_IOH) {
+	IOH = p_IOH;
 };
 
-void LUIC::component::setflags(flags p_flags) {
-    flgs = p_flags;
+void LUIC::Component::SetFlags(flags p_flags) {
+	Flags = p_flags;
 };
 
-flags LUIC::component::getflags() {
-    return flgs;
+flags LUIC::Component::GetFlags() {
+	return Flags;
 };
 
-void LUIC::component::addchild(component* p_child) {
-    p_child->setparent (this);
-    p_child->setioh    (ioh);
+void LUIC::Component::AddChild(Component* p_child) {
+	p_child->SetParent(this);
+	p_child->SetIOHandle(IOH);
 
-    children .push_back (p_child);
+	Children .push_back (p_child);
 };
 
-i16 LUIC::component::getchild(component* p_child) {
-    for (ui16 i = 0; i < (ui16)children.size(); ++ i) {
-        if (children[i] == p_child) return i;
-    };
+i16 LUIC::Component::GetChild(Component* p_child) {
+	for (ui16 i = 0; i < (ui16)Children.size(); ++ i)
+		if (Children[i] == p_child)
+			return i;
 
-    return -1;
+	return -1;
 };
 
-void LUIC::component::remchild(ui16 p_idx) {
-    children.erase(children.begin() + p_idx);
+void LUIC::Component::RemoveChild(ui16 p_idx) {
+	Children.erase(Children.begin() + p_idx);
 };
 
-void LUIC::component::pbchild(component* p_child) {
-    remchild (getchild (p_child));
-    addchild (p_child);
+void LUIC::Component::PushBackChild(Component* p_child) {
+	RemoveChild(GetChild(p_child));
+	AddChild(p_child);
 };
 
-void LUIC::component::setpos(i16 p_posx, i16 p_posy) {
-    if (p_posx < 0) p_posx = 0;
-    if (p_posy < 0) p_posy = 0;
+void LUIC::Component::SetPos(i16 p_PosX, i16 p_PosY) {
+	if (p_PosX < 0)
+		p_PosX = 0;
 
-    posx = p_posx;
-    posy = p_posy;
+	if (p_PosY < 0)
+		p_PosY = 0;
 
-    if (parent == NULL)
-        wnd .setpos (posx, posy);
-    else {
-        if (posx < inset) posx = inset;
-        if (posy < inset) posy = inset;
+	PosX = p_PosX;
+	PosY = p_PosY;
 
-        if (posx > parent->getszx () - wnd .getszx () - inset) posx = parent->getszx () - wnd .getszx () - inset;
-        if (posy > parent->getszy () - wnd .getszy () - inset) posy = parent->getszy () - wnd .getszy () - inset;
+	if (Parent == NULL)
+		Wnd.SetPos(PosX, PosY);
+	else {
+		if (PosX < Inset)
+			PosX = Inset;
 
-        wnd .setpos (parent->__gttlpsx () + posx, parent->__gttlpsy () + posy);
-    };
+		if (PosY < Inset)
+			PosY = Inset;
 
-    __fxps ();
+		if (PosX > Parent->GetSizeX() - Wnd.GetSizeX() - Inset)
+			PosX = Parent->GetSizeX() - Wnd.GetSizeX() - Inset;
+
+		if (PosY > Parent->GetSizeY() - Wnd.GetSizeY() - Inset)
+			PosY = Parent->GetSizeY() - Wnd.GetSizeY() - Inset;
+
+		Wnd.SetPos(Parent->__gttlpsx() + PosX, Parent->__gttlpsy() + PosY);
+	};
+
+	__fxps();
 };
 
-void LUIC::component::setinset(bool p_on) {
-    inset = p_on;
+void LUIC::Component::SetInset(bool p_on) {
+	Inset = p_on;
 };
 
-bool LUIC::component::getinset() {
-    return inset;
+bool LUIC::Component::GetInset() {
+	return Inset;
 };
 
-ui16 LUIC::component::getposx() {
-    return posx;
+ui16 LUIC::Component::GetPosX() {
+	return PosX;
 };
 
-ui16 LUIC::component::getposy() {
-    return posy;
+ui16 LUIC::Component::GetPosY() {
+	return PosY;
 };
 
-void LUIC::component::setsz(i16 p_szx, i16 p_szy) {
-    if (p_szx < 0) p_szx = 0;
-    if (p_szy < 0) p_szy = 0;
+void LUIC::Component::SetSize(i16 p_SizeX, i16 p_SizeY) {
+	if (p_SizeX < 0)
+		p_SizeX = 0;
 
-    wnd.setsz(p_szx, p_szy);
+	if (p_SizeY < 0)
+		p_SizeY = 0;
 
-    for (i16 i = (i16)children.size() - 1; i >= 0; -- i) {
-        component *child = children[i];
+	Wnd.SetSize(p_SizeX, p_SizeY);
 
-        if (child->getflags () & LUIC_FLAGS_COMPONENT_SCALED) {
-            child->setsz(p_szx - 2, p_szy - 2);
-            child->setpos(1, 1);
-        };
-    };
+	for (i16 i = (i16)Children.size() - 1; i >= 0; -- i) {
+		Component *child = Children[i];
+
+		if (child->GetFlags() & LUIC_FLAGS_COMPONENT_SCALED) {
+			child->SetSize(p_SizeX - 2, p_SizeY - 2);
+			child->SetPos(1, 1);
+		};
+	};
 };
 
-ui16 LUIC::component::getszx() {
-    return wnd.getszx();
+ui16 LUIC::Component::GetSizeX() {
+	return Wnd.GetSizeX();
 };
 
-ui16 LUIC::component::getszy() {
-    return wnd.getszy();
+ui16 LUIC::Component::GetSizeY() {
+	return Wnd.GetSizeY();
 };
 
-void LUIC::component::setfcs(bool p_fcs) {
-    infcs = p_fcs;
+void LUIC::Component::SetFocus(bool p_fcs) {
+	InFocus = p_fcs;
 };
 
-bool LUIC::component::isinfcs() {
-    return infcs;
+bool LUIC::Component::IsInFocus() {
+	return InFocus;
 };
 
-void LUIC::component::totop() {
-    if (parent == NULL) ioh->pbchild(this);
-    else parent->pbchild(this);
+void LUIC::Component::ToTop() {
+	if (Parent == NULL)
+		IOH->PushBackChild(this);
+	else
+		Parent->PushBackChild(this);
 };
 
-void LUIC::component::setvsble(bool p_vsble) {
-    vsble = p_vsble;
+void LUIC::Component::SetVisible(bool p_Visible) {
+	Visible = p_Visible;
 };
 
-bool LUIC::component::getvsble() {
-    return vsble;
+bool LUIC::Component::GetVisible() {
+	return Visible;
 };
 
-str LUIC::component::gettype() {
-    return type;
+str LUIC::Component::GetType() {
+	return Type;
 };
 
-bool LUIC::component::lstinfcs() {
-    return linfcs;
+bool LUIC::Component::IsLastInFocus() {
+	return LastInFocus;
 };
 
-LUIC::component* LUIC::component::getparent() {
-    return parent;
+LUIC::Component* LUIC::Component::GetParent() {
+	return Parent;
 };
 
-LUIC::iohandle* LUIC::component::getioh() {
-    return ioh;
+LUIC::IOHandle* LUIC::Component::GetIOHandle() {
+	return IOH;
 };
 
-void LUIC::component::__sttlps(ui16 p_posx, ui16 p_posy) {
-    wnd.setpos(p_posx, p_posy);
+void LUIC::Component::__sttlps(ui16 p_PosX, ui16 p_PosY) {
+	Wnd.SetPos(p_PosX, p_PosY);
 };
 
-ui16 LUIC::component::__gttlpsx() {
-    return wnd.getposx();
+ui16 LUIC::Component::__gttlpsx() {
+	return Wnd.GetPosX();
 };
 
-ui16 LUIC::component::__gttlpsy() {
-    return wnd.getposy();
+ui16 LUIC::Component::__gttlpsy() {
+	return Wnd.GetPosY();
 };
 
-void LUIC::component::__fcsprnts() {
-    if (parent != NULL) {
-        parent->pbchild (this);
-        parent->__fcsprnts ();
-    } else {
-        ioh->pbchild (this);
+void LUIC::Component::__fcsprnts() {
+	if (Parent != NULL) {
+		Parent->PushBackChild(this);
+		Parent->__fcsprnts();
+	} else {
+		IOH->PushBackChild(this);
 
-        infcs  = true;
-        linfcs = true;
-    };
+		InFocus = true;
+		LastInFocus = true;
+	};
 };
 
-void LUIC::component::__fxps() {
-    for (i16 i = (i16)children.size() - 1; i >= 0; -- i) {
-        children[i]->setpos (children[i]->getposx (), children[i]->getposy ());
-        children[i]->__fxps ();
-    };
+void LUIC::Component::__fxps() {
+	for (i16 i = (i16)Children.size() - 1; i >= 0; -- i) {
+		Children[i]->SetPos(Children[i]->GetPosX(), Children[i]->GetPosY());
+		Children[i]->__fxps();
+	};
 };
 
-LUIC::window* LUIC::component::__gwndacs() {
-    return &wnd;
+LUIC::Window* LUIC::Component::__gwndacs() {
+	return &Wnd;
 };

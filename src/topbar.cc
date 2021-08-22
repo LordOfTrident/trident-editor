@@ -3,294 +3,308 @@
 #define CTRL(key) ((key) & 0x1f)
 
 str __gcurdt() {
-    time_t    now = time(0);
-    struct tm tstruct;
-    char      buf[80];
-    tstruct = *localtime(&now);
+	time_t now = time(0);
+	struct tm tstruct;
+	char buf[80];
+	tstruct = *localtime(&now);
 
-    strftime(buf, sizeof(buf), " %d/%m/%Y %X ", &tstruct);
+	strftime(buf, sizeof(buf), " %d/%m/%Y %X ", &tstruct);
 
-    return buf;
+	return buf;
 };
 
-LUIC::option::option() {};
+LUIC::Option::Option() {};
 
-LUIC::option::option(str p_name, vector <suboption> p_subopts):
-    name    (p_name),
-    subopts (p_subopts)
+LUIC::Option::Option(str p_Name, vector <SubOption> p_SubOptions):
+	Name(p_Name),
+	SubOptions(p_SubOptions)
 {};;
 
-LUIC::suboption::suboption() {};
+LUIC::SubOption::SubOption() {};
 
-LUIC::suboption::suboption(str p_name, str p_kb):
-    name    (p_name),
-    keybind (p_kb) 
+LUIC::SubOption::SubOption(str p_Name, str p_kb):
+	Name(p_Name),
+	Keybind(p_kb)
 {
-    if (name.length() > 9) {
-        name =  name.substr(0, 9);
-        name += "... " + keybind;;
-    } else
-        name += str (13 - name.length(), ' ') + keybind;
+	if (Name.length() > 9) {
+		Name = Name.substr(0, 9);
+		Name += "... " + Keybind;;
+	} else
+		Name += str(13 - Name.length(), ' ') + Keybind;
 };
 
-LUIC::topbar::topbar() {};
+LUIC::TopBar::TopBar() {};
 
-LUIC::topbar::topbar(str p_ttl, vector <option> p_options):
-    ttl     (" " + p_ttl + " "),
-    prsd    (false),
-    ovr     (0),
-    subovr  (0),
-    chc     (-1),
-    subchc  (0),
-    options (p_options) 
+LUIC::TopBar::TopBar(str p_Title, vector <Option> p_Options):
+	Title(" " + p_Title + " "),
+	Pressed(false),
+	Over(0),
+	SubOver(0),
+	Choice(-1),
+	SubChoice(0),
+	Options(p_Options)
 {
-    type = LUIC_TYPE_TOPBAR;
-    
-    posx = 0;
-    posy = 0;
+	Type = LUIC_TYPE_TOPBAR;
 
-    wnd  = window (posx, posy, 5, 1);
-    ownd = window (0,    0,    5, 5);
+	PosX = 0;
+	PosY = 0;
 
-    walker_sprites[0] = '/';
-    walker_sprites[1] = '-';
-    walker_sprites[2] = '\\';
-    walker_sprites[3] = '|';
-    walker_state = 0;
-    walker = 0;
+	Wnd = Window(PosX, PosY, 5, 1);
+	OWnd = Window(0, 0, 5, 5);
+
+	WalkerSprites[0] = '/';
+	WalkerSprites[1] = '-';
+	WalkerSprites[2] = '\\';
+	WalkerSprites[3] = '|';
+	WalkerState = 0;
+	Walker = 0;
 };
 
-void LUIC::topbar::setttl(str p_ttl) {
-    ttl = " " + p_ttl + " ";
+void LUIC::TopBar::SetTitle(str p_Title) {
+	Title = " " + p_Title + " ";
 };
 
-i8 LUIC::topbar::getsboptst(ui8 p_idx) {
-    if (chc != p_idx) return LUIC_TOPBAR_OPTNOTCHOSEN;
-
-    return subchc;
+i8 LUIC::TopBar::GetChoice() {
+	return Choice;
 };
 
-void LUIC::topbar::draw() {
-    if (ioh == NULL || !vsble) return;
-
-    if (parent == NULL) {
-        if (ioh->getwsizex() != wnd.getszx())
-            wnd .setsz (ioh->getwsizex(), 1);
-    } else {
-        if (parent->getszx() != wnd.getszx()) 
-            wnd .setsz (parent->getszx(), 1);
-    };
-
-    str date = __gcurdt ();
-
-    wnd .setbgclr (__LUIC__SYSCLR);
-    wnd .setattr  (A_BLINK, true);
-    wnd .outatclr (wnd .getszx() - ttl.length(), 0, ttl.c_str(), __LUIC__HGHLGHT);
-    wnd .setattr  (A_BLINK, false);
-    wnd .outatclr (wnd .getszx() - ttl.length() - date.length(), 0, date.c_str(), __LUIC__COMMON);
-
-    ui16 pos = 0;
-
-    wnd .setclr (__LUIC__COMMON);
-    for (ui16 i = 0; i < options.size(); ++ i) {
-        if (i == ovr && infcs) {
-            wnd  .setclr (__LUIC__HGHLGHT);
-            ownd .setpos  (pos, 1);
-        };
-
-        wnd .outat (pos, 0, " " + options[i].name + " ");
-        pos += options[i].name.length() + 2;
-
-        if (i == ovr && infcs)
-            wnd .setclr (__LUIC__COMMON);
-    };
-
-    //wnd .outatclr (pos, 0, std::to_string (ioh->gettick ()), __LUIC__SYSCLR);
-
-    if (walker_state != -1) 
-        wnd .outatclr (walker + pos, 0, str(1, walker_sprites[walker_state]), __LUIC__SYSCLR);
-        //wnd .wchoutatclr (walker +pos, 0, WACS_LANTERN, __LUIC__SYSCLR);
-
-    if (infcs) {
-        ui16 szx = 0;
-
-        for (ui16 i = 0; i < options[ovr].subopts.size(); ++ i) {
-            if (options[ovr].subopts[i].name.length() > szx)
-                szx = options[ovr].subopts[i].name.length();
-        };
-
-        ownd .setsz  (szx + 4, options[ovr].subopts.size() + 2);
-        ownd .setbgclr (__LUIC__COMMON);
-
-        for (ui16 i = 0; i < options[ovr].subopts.size(); ++ i) {
-            if (i == subovr)
-                ownd .setclr (__LUIC__HGHLGHT);
-
-            ownd .outat (1, i + 1, " " + options[ovr].subopts[i].name + str (szx - options[ovr].subopts[i].name.length() + 2, ' '));
-
-            if (i == subovr)
-                ownd .setclr (__LUIC__COMMON);
-        };
-
-        ownd .drawshdw (__LUIC__SHDWCLR);
-        ownd .setbrdr  (0, 0, ownd.getszx() - 1, ownd.getszy() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
-    };
-
-    if (ioh->gettick() % 8 == 0) {
-        ++ walker;
-        i32 max = wnd. getszx () - pos - date .length () - ttl .length () - 1;
-
-        if (walker_state == -1 && max >= 0) walker_state = 0;
-        if (max < 0) walker_state = -1;
-        if (walker > max) walker = 0;
-    };
-
-    if (ioh->gettick() % 16 == 0 && walker_state != -1) {
-        ++ walker_state;
-        if (walker_state > 3) walker_state = 0;
-    };
+i8 LUIC::TopBar::GetSubChoice() {
+	return SubChoice;
 };
 
-void LUIC::topbar::input(i16 p_in, MEVENT* p_evt) {
-    if (ioh == NULL || !vsble) return;
+void LUIC::TopBar::Draw() {
+	if (IOH == NULL or not Visible)
+		return;
 
-    chc    = -1;
-    subchc = -1;
+	if (Parent == NULL) {
+		if (IOH->GetWindowSizeX() != Wnd.GetSizeX())
+			Wnd.SetSize(IOH->GetWindowSizeX(), 1);
+	} else
+		if (Parent->GetSizeX() != Wnd.GetSizeX())
+			Wnd.SetSize(Parent->GetSizeX(), 1);
 
-    switch (p_in) {
-        case KEY_MOUSE: {
-            if (p_evt->bstate & BUTTON1_RELEASED) {
-                if (prsd) {
-                    chc    = ovr;
-                    subchc = subovr;
-                    infcs  = false;
-                    prsd   = false;
-                };
-            } else if (p_evt->bstate & BUTTON1_PRESSED) {
-                if (p_evt->y == posy && 
-                    p_evt->x >= posx && 
-                    p_evt->x < posx + wnd.getszx()) {
-                    ioh->__schldfcsed (false);
-                    infcs = true;
+	str date = __gcurdt();
 
-                    ui16 pos = 0;
+	Wnd.SetBackgroundColor(__LUIC__SYSCLR);
+	Wnd.SetAttribute(A_BLINK, true);
+	Wnd.OutAt(Wnd.GetSizeX() - Title.length(), 0, Title.c_str(), __LUIC__HGHLGHT);
+	Wnd.SetAttribute(A_BLINK, false);
+	Wnd.OutAt(Wnd.GetSizeX() - Title.length() - date.length(), 0, date.c_str(), __LUIC__COMMON);
 
-                    for (ui16 i = 0; i < options.size(); ++ i) {
-                        if (p_evt->x >= pos && p_evt->x < pos + 2 + (i32)options[i].name.length()) {
-                            ovr = i;
-                            subovr = 0;
+	ui16 pos = 0;
 
-                            break;
-                        };
+	Wnd.SetColor(__LUIC__COMMON);
+	for (ui16 i = 0; i < Options.size(); ++ i) {
+		if (i == Over and InFocus) {
+			Wnd.SetColor(__LUIC__HGHLGHT);
+			OWnd.SetPos(pos, 1);
+		};
 
-                        pos += options[i].name.length() + 2;
-                    };
-                } else if (p_evt->x >= ownd.getposx() &&
-                           p_evt->x < ownd.getposx() + ownd.getszx() &&
-                           p_evt->y < ownd.getposy() + ownd.getszy()) {
-                    if (!infcs) break;
-                    
-                    if (p_evt->x > ownd.getposx() &&
-                        p_evt->x < ownd.getposx() + ownd.getszx() - 1 && 
-                        p_evt->y > ownd.getposy() && 
-                        p_evt->y < ownd.getposy() + ownd.getszy() - 1) {
-                        for (ui16 i = 0; i < options[ovr].subopts.size(); ++ i) {
-                            if (p_evt->y == i + ownd.getposy() + 1) {
-                                subovr = i;
-                                prsd   = true;
+		Wnd.OutAt(pos, 0, " " + Options[i].Name + " ");
+		pos += Options[i].Name.length() + 2;
 
-                                break;
-                            };
-                        };
-                    };
-                } else infcs = false;
-            };
+		if (i == Over and InFocus)
+			Wnd.SetColor(__LUIC__COMMON);
+	};
 
-            break;
-        };
+	if (WalkerState != -1)
+		Wnd.OutAt(Walker + pos, 0, str(1, WalkerSprites[WalkerState]), __LUIC__SYSCLR);
 
-        case 27: {
-            if (ioh->__gchldfcsed ()) break;
+	if (InFocus) {
+		ui16 szx = 0;
 
-            if (infcs) 
-                infcs = false;
-            else {
-                ioh->__schldfcsed (false);
-                infcs = true;
-            };
+		for (ui16 i = 0; i < Options[Over].SubOptions.size(); ++ i) {
+			if (Options[Over].SubOptions[i].Name.length() > szx)
+				szx = Options[Over].SubOptions[i].Name.length();
+		};
 
-            break;
-        };
+		OWnd.SetSize(szx + 4, Options[Over].SubOptions.size() + 2);
+		OWnd.SetBackgroundColor(__LUIC__COMMON);
 
-        case KEY_RIGHT: {
-            if (!infcs) break;
+		for (ui16 i = 0; i < Options[Over].SubOptions.size(); ++ i) {
+			if (i == SubOver)
+				OWnd.SetColor(__LUIC__HGHLGHT);
 
-            if (ovr == (i16)options.size() - 1) ovr = -1;
-            ++ ovr;
+			OWnd.OutAt(1, i + 1, " " + Options[Over].SubOptions[i].Name + str (szx - Options[Over].SubOptions[i].Name.length() + 2, ' '));
 
-            subovr = 0;
+			if (i == SubOver)
+				OWnd.SetColor(__LUIC__COMMON);
+		};
 
-            break;
-        };
+		OWnd.DrawShadow(__LUIC__SHDWCLR);
+		OWnd.SetBorder(0, 0, OWnd.GetSizeX() - 1, OWnd.GetSizeY() - 1, __LUIC__WBACLR, __LUIC__WBBCLR);
+	};
 
-        case KEY_LEFT: {
-            if (!infcs) break;
+	if (IOH->GetTick() % 8 == 0) {
+		++ Walker;
+		i32 max = Wnd.GetSizeX() - pos - date.length() - Title.length() - 1;
 
-            if (ovr == 0) ovr = options.size();
-            -- ovr;
+		if (WalkerState == -1 and max >= 0) WalkerState = 0;
+		if (max < 0) WalkerState = -1;
+		if (Walker > max) Walker = 0;
+	};
 
-            subovr = 0;
+	if (IOH->GetTick() % 16 == 0 and WalkerState != -1) {
+		++ WalkerState;
+		if (WalkerState > 3) WalkerState = 0;
+	};
+};
 
-            break;
-        };
+void LUIC::TopBar::Input(i16 p_Input, MEVENT* p_Event) {
+	if (IOH == NULL or not Visible)
+		return;
 
-        case KEY_DOWN: {
-            if (!infcs) break;
+	Choice = -1;
+	SubChoice = -1;
 
-            if (subovr == (i16)options[ovr].subopts.size() - 1) subovr = -1;
-            ++ subovr;
+	switch (p_Input) {
+		case KEY_MOUSE: {
+			if (p_Event->bstate & BUTTON1_RELEASED) {
+				if (Pressed) {
+					Choice = Over;
+					SubChoice = SubOver;
+					InFocus = false;
+					Pressed = false;
+				};
+			} else if (p_Event->bstate & BUTTON1_PRESSED) {
+				if (p_Event->y == PosY and p_Event->x >= PosX and p_Event->x < PosX + Wnd.GetSizeX()) {
+					IOH->__schldfcsed(false);
+					InFocus = true;
 
-            break;
-        };
+					ui16 pos = 0;
 
-        case KEY_UP: {
-            if (!infcs) break;
+					for (ui16 i = 0; i < Options.size(); ++ i) {
+						if (p_Event->x >= pos and p_Event->x < pos + 2 + (i32)Options[i].Name.length()) {
+							Over = i;
+							SubOver = 0;
 
-            if (subovr == 0) subovr = options[ovr].subopts.size();
-            -- subovr;
+							break;
+						};
 
-            break;
-        };
+						pos += Options[i].Name.length() + 2;
+					};
+				} else if (p_Event->x >= OWnd.GetPosX() and p_Event->x < OWnd.GetPosX() + OWnd.GetSizeX() and p_Event->y < OWnd.GetPosY() + OWnd.GetSizeY()) {
+					if (not InFocus)
+						break;
 
-        case 10: {
-            if (!infcs) break;
-            
-            chc    = ovr;
-            subchc = subovr;
-            infcs  = false;
+					ui16 BRCornerPosX = OWnd.GetPosX() + OWnd.GetSizeX() - 1;
+					ui16 BRCornerPosY = OWnd.GetPosY() + OWnd.GetSizeY() - 1;
 
-            break;
-        };
+					bool XCheck = p_Event->x > OWnd.GetPosX() and p_Event->x < BRCornerPosX;
+					bool YCheck = p_Event->y > OWnd.GetPosY() and p_Event->y < BRCornerPosY;
 
-        default: {
-            for (ui16 i = 0; i < options.size(); ++ i) {
-                for (ui16 j = 0; j < options[i].subopts.size(); ++ j) {
-                    str keybind = options[i].subopts[j].keybind;
-                    if (keybind.length() >= 6 && keybind.substr(0, 5) == "CTRL+") {
-                        if (p_in == CTRL(keybind[5])) {
-                            ovr    = i;
-                            subovr = j;
-                            
-                            chc    = ovr;
-                            subchc = subovr;
+					if (XCheck and YCheck) {
+						for (ui16 i = 0; i < Options[Over].SubOptions.size(); ++ i) {
+							if (p_Event->y == i + OWnd.GetPosY() + 1) {
+								SubOver = i;
+								Pressed = true;
 
-                            break;
-                        };
-                    };
-                };
-            };
+								break;
+							};
+						};
+					};
+				} else
+					InFocus = false;
+			};
 
-            break;
-        };
-    };
+			break;
+		};
+
+		case 27: {
+			if (IOH->__gchldfcsed())
+				break;
+
+			if (InFocus)
+				InFocus = false;
+			else {
+				IOH->__schldfcsed(false);
+				InFocus = true;
+			};
+
+			break;
+		};
+
+		case KEY_RIGHT: {
+			if (not InFocus)
+				break;
+
+			if (Over == (i16)Options.size() - 1)
+				Over = -1;
+
+			++ Over;
+			SubOver = 0;
+
+			break;
+		};
+
+		case KEY_LEFT: {
+			if (not InFocus)
+				break;
+
+			if (Over == 0)
+				Over = Options.size();
+
+			-- Over;
+			SubOver = 0;
+
+			break;
+		};
+
+		case KEY_DOWN: {
+			if (not InFocus)
+				break;
+
+			if (SubOver == (i16)Options[Over].SubOptions.size() - 1)
+				SubOver = -1;
+
+			++ SubOver;
+
+			break;
+		};
+
+		case KEY_UP: {
+			if (not InFocus)
+				break;
+
+			if (SubOver == 0)
+				SubOver = Options[Over].SubOptions.size();
+
+			-- SubOver;
+
+			break;
+		};
+
+		case 10: {
+			if (not InFocus)
+				break;
+
+			Choice = Over;
+			SubChoice = SubOver;
+			InFocus = false;
+
+			break;
+		};
+
+		default: {
+			for (ui16 i = 0; i < Options.size(); ++ i) {
+				for (ui16 j = 0; j < Options[i].SubOptions.size(); ++ j) {
+					str Keybind = Options[i].SubOptions[j].Keybind;
+
+					if (Keybind.length() >= 6 and Keybind.substr(0, 5) == "CTRL+") {
+						if (p_Input == CTRL(Keybind[5])) {
+							Over = i;
+							SubOver = j;
+
+							Choice = Over;
+							SubChoice = SubOver;
+
+							break;
+						};
+					};
+				};
+			};
+
+			break;
+		};
+	};
 };

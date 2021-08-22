@@ -9,19 +9,17 @@
 #include "iohandle.hh"
 
 namespace LUIC {
-    class label: public component {
-    public:
+	class Label: public Component {
+	public:
+		Label();
+		Label(str p_Text, ui16 p_PosX, ui16 p_PosY, flags p_Flags);
 
-        label ();
-        label (str p_txt, ui16 p_posx, ui16 p_posy, flags p_flags);
+		virtual void Draw();
+		virtual void Input(i16 p_Input, MEVENT* p_Event);
 
-        virtual void draw  ();
-        virtual void input (i16 p_in, MEVENT* p_evt);
+		void SetText(str p_Text);
 
-        void settxt   (str p_txt);
-
-    private:
-
-        str   txt;
-    };
+	private:
+		str Text;
+	};
 };

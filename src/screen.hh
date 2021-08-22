@@ -5,32 +5,31 @@
 #include "types.hh"
 
 namespace LUIC {
-    namespace screen {
-        class pixel {
-        public:
+	namespace Screen {
+		class Pixel {
+		public:
+			Pixel();
 
-            pixel ();
+			color Color;
+			i32 Attribute;
+			ch Char;
+			cch* CChar;
+		};
 
-            color pclr;
-            i32   pattr;
-            ch    pch;
-            cch*  pcch;
-        };
+		extern vector <vector <Pixel>> Pixels;
+		extern color LastColor;
+		extern i32 LastAttribute;
 
-        extern vector <vector <pixel>> pixels;
-        extern color                   lastclr;
-        extern i32                     lastattr;
+		void Out(ui16 p_PosX, ui16 p_PosY, ch p_Char);
+		void Out(ui16 p_PosX, ui16 p_PosY, cch* p_CChar);
+		void Out(ui16 p_PosX, ui16 p_PosY, str p_Str);
 
-        void outch  (ui16 p_posx, ui16 p_posy, ch p_ch);
-        void outwch (ui16 p_posx, ui16 p_posy, cch* p_ch);
-        void outstr (ui16 p_posx, ui16 p_posy, str p_str);
+		void OutWrap(ui16 p_PosX, ui16 p_PosY, ui16 p_MinPosX, ui16 p_MinPosY, ui16 p_MaxPosX, ui16 p_MaxPosY, ch p_Char);
+		void OutWrap(ui16 p_PosX, ui16 p_PosY, ui16 p_MinPosX, ui16 p_MinPosY, ui16 p_MaxPosX, ui16 p_MaxPosY, cch* p_CChar);
+		void OutWrap(ui16 p_PosX, ui16 p_PosY, ui16 p_MinPosX, ui16 p_MinPosY, ui16 p_MaxPosX, ui16 p_MaxPosY, str p_Str);
 
-        void outch_box  (ui16 p_posx, ui16 p_posy, ui16 p_minposx, ui16 p_minposy, ui16 p_maxposx, ui16 p_maxposy, ch p_ch);
-        void outwch_box (ui16 p_posx, ui16 p_posy, ui16 p_minposx, ui16 p_minposy, ui16 p_maxposx, ui16 p_maxposy, cch* p_ch);
-        void outstr_box (ui16 p_posx, ui16 p_posy, ui16 p_minposx, ui16 p_minposy, ui16 p_maxposx, ui16 p_maxposy, str p_str);
+		void FillBox(ui16 p_MinPosX, ui16 p_MinPosY, ui16 p_MaxPosX, ui16 p_MaxPosY, ch p_Char);
 
-        void fillch_box (ui16 p_minposx, ui16 p_minposy, ui16 p_maxposx, ui16 p_maxposy, ch p_ch);
-
-        void update ();
-    };
+		void Update();
+	};
 };

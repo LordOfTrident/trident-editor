@@ -6,41 +6,38 @@
 #include "screen.hh"
 
 namespace LUIC {
-    class window {
-    public:
+	class Window {
+	public:
+		Window();
+		Window(i16 p_PosX, i16 p_PosY, ui16 p_SizeX, ui16 p_SizeY);
 
-        window ();
-        window (i16 p_posx, i16 p_posy, ui16 p_szx, ui16 p_szy);
+		void SetPos(i16 p_PosX, i16 p_PosY);
+		ui16 GetPosX();
+		ui16 GetPosY();
 
-        void  setpos  (i16 p_posx, i16 p_posy);
-        ui16 getposx ();
-        ui16 getposy ();
+		void SetSize(ui16 p_SizeX, ui16 p_SizeY);
+		ui16 GetSizeX();
+		ui16 GetSizeY();
 
-        void  setsz  (ui16 p_szx, ui16 p_szy);
-        ui16 getszx ();
-        ui16 getszy ();
+		void SetBorder(ui16 p_PosXA, ui16 p_PosYA, ui16 p_PosXB, ui16 p_PosYB, color p_ColorA, color p_ColorB);
+		void SetDBBorder(ui16 p_PosXA, ui16 p_PosYA, ui16 p_PosXB, ui16 p_PosYB, color p_ColorA, color p_ColorB);
 
-        void setbrdr   (ui16 p_posxa, ui16 p_posya, ui16 p_posxb, ui16 p_posyb, color p_clra, color p_clrb);
-        void setdbbrdr (ui16 p_posxa, ui16 p_posya, ui16 p_posxb, ui16 p_posyb, color p_clra, color p_clrb);
+		void OutAt(ui16 p_PosX, ui16 p_PosY, str p_txt);
+		void OutAt(ui16 p_PosX, ui16 p_PosY, str p_txt, color p_Color);
+		void OutAt(ui16 p_PosX, ui16 p_PosY, cch* p_ch);
+		void OutAt(ui16 p_PosX, ui16 p_PosY, cch* p_ch, color p_Color);
 
-        void outat       (ui16 p_posx, ui16 p_posy, str p_txt);
-        void outatclr    (ui16 p_posx, ui16 p_posy, str p_txt, color p_clr);
-        void wchoutat    (ui16 p_posx, ui16 p_posy, cch* p_ch);
-        void wchoutatclr (ui16 p_posx, ui16 p_posy, cch* p_ch, color p_clr);
+		void SetBackgroundColor(color p_Color);
+		void SetColor(color p_Color);
+		void SetAttribute(i32 p_Attribute, bool p_On);
 
-        void setbgclr (color p_clr);
-        void setclr   (color p_clr);
-        void setattr  (i32 p_attr, bool p_on);
+		void DrawShadow(color p_Color);
+		void Clear();
 
-        void drawshdw (color p_clr);
-        void clear    ();
+		void __swsz(ui16 p_SizeX, ui16 p_SizeY);
+		void __swps(ui16 p_PosX, ui16 p_PosY);
 
-        void __swsz (ui16 p_szx, ui16 p_szy);
-        void __swps (ui16 p_posx, ui16 p_posy);
-
-    private:
-
-        ui16 posx, posy,
-              szx,  szy;
-    };
+	private:
+		ui16 PosX, PosY, SizeX, SizeY;
+	};
 };

@@ -1,397 +1,489 @@
 #include "editor.hh"
 
-str __shptxtbuf(str p_txt, i32 p_x, i32 p_y, i32 p_szx, i32 p_szy) {
-    str shpdstr = "";
-    i32 posx = 0, posy = 0;
-    
-    for (ui32 i = 0; i < p_txt.length(); ++ i) {
-        if (((posx >= p_x && posx < p_szx) || p_txt[i] == 10) && posy >= p_y && posy < p_szy)
-            shpdstr += p_txt[i];
+LUIC::Editor::Editor() {};
 
-        if (p_txt[i] == 10) {
-            posx = -1;
-
-            ++ posy;
-        };
-
-        ++ posx;
-    };
-
-    return shpdstr;
-};
-
-LUIC::editor::editor() {};
-
-LUIC::editor::editor(ui16 p_posx, ui16 p_posy, ui16 p_szx, ui16 p_szy, flags p_flags):
-    txt    (""),
-    prsd   (false),
-    modif  (false),
-    curpos (0),
-    curx   (0),
-    cury   (0),
-    scrx   (0),
-    scry   (0)
+LUIC::Editor::Editor(ui16 p_PosX, ui16 p_PosY, ui16 p_szx, ui16 p_szy, flags p_flags):
+	Text(""),
+	Pressed(false),
+	Modif(false),
+	CurRender(true),
+	CurPos (0),
+	CurX(0),
+	CurY(0),
+	ScrollX(0),
+	ScrollY(0),
+	CurOff(0),
+	HigherLinePos(0)
 {
-    type = LUIC_TYPE_EDITOR;
-    flgs = p_flags | LUIC_FLAGS_COMPONENT_SCALED;
+	Type = LUIC_TYPE_EDITOR;
+	Flags = p_flags | LUIC_FLAGS_COMPONENT_SCALED;
+	CurOff = 0;
 
-    colorscheme = {
-        __LUIC__SHDWCLR,
-        __LUIC__TXTCLR,
-        __LUIC__TXTCLR
-    };
-    
-    posx = p_posx;
-    posy = p_posy;
+	ColorScheme = {
+		__LUIC__SHDWCLR,
+		__LUIC__TXTCLR,
+		__LUIC__TXTCLR
+	};
 
-    wnd = window (posx, posy, p_szx, p_szy);
+	PosX = p_PosX;
+	PosY = p_PosY;
+
+	Wnd = Window(PosX, PosY, p_szx, p_szy);
 };
 
-void LUIC::editor::settxt(str p_txt) {
-    txt = p_txt;
+void LUIC::Editor::SetText(str p_Text) {
+	Text = p_Text;
 
-    curpos = 0;
-    scrx = 0;
-    scry = 0;
+	CurPos = 0;
+	ScrollX = 0;
+	ScrollY = 0;
 };
 
-str LUIC::editor::gettxt() {
-    return txt;
+str LUIC::Editor::GetText() {
+	return Text;
 };
 
-void LUIC::editor::setft(str p_ft) {
-    ft = p_ft;
+void LUIC::Editor::SetFT(str p_FT) {
+	FT = p_FT;
 };
 
-str LUIC::editor::getft() {
-    return txt;
+str LUIC::Editor::GetFT() {
+	return Text;
 };
 
-void LUIC::editor::setmodif(bool p_m) {
-    modif = p_m;
+void LUIC::Editor::SetModif(bool p_Modif) {
+	Modif = p_Modif;
 };
 
-bool LUIC::editor::getmodif() {
-    return modif;
+bool LUIC::Editor::GetModif() {
+	return Modif;
 };
 
-void LUIC::editor::setttl(str p_ttl) {
-    ttl = " " + p_ttl + " ";
+void LUIC::Editor::SetTitle(str p_Title) {
+	Title = " " + p_Title + " ";
 };
 
-str LUIC::editor::getttl() {
-    return ttl.substr(1, ttl.length() - 2);
+str LUIC::Editor::GetTitle() {
+	return Title.substr(1, Title.length() - 2);
 };
 
-void LUIC::editor::draw() {
-    if (ioh == NULL || !vsble) return;
-
-    if (parent == NULL) wnd .drawshdw (colorscheme[0]);
-
-    wnd .setbgclr (colorscheme[2]);
-
-    str ftxt = __shptxtbuf(txt, scrx, scry, getszx() + scrx, getszy() + scry);
-
-    ui16 rndrx = 0, rndry = 0;
-    for (ui32 i = 0; i <= (ui32)ftxt.length(); ++ i) {
-        bool curon = false;
-
-        if (rndrx == curx - scrx && rndry == cury - scry && infcs) {
-            wnd .setattr (A_REVERSE, true);
-
-            curon = true;
-        };
-
-        if (i < ftxt.length() && ftxt[i] != 10) {
-            wnd .outat (rndrx, rndry, ftxt[i] > 31 && ftxt[i] < 127? str(1, ftxt[i]) : " ");
-
-            ++ rndrx;
-        } else {
-            if (curon)
-                wnd .outat   (rndrx, rndry, " ");
-
-            if (ftxt[i] == 10) {
-                rndrx = 0;
-
-                ++ rndry;
-            };
-        };
-
-        if (curon)
-            wnd .setattr (A_REVERSE, false);
-    };
-
-    //wnd .outatclr (0, getszy() - 1, str(getszx(), ' '), colorscheme[1]);
-
-    if (parent != NULL) {
-        parent->__gwndacs ()->outatclr (1, parent->getszy () - 1, str(std::to_string(cury) + ":" + std::to_string(curx) + " | Mem: " + std::to_string(txt.length()) + "B | ft: " + ft + " | en: ASCII").substr(0, parent->getszx () - 2), colorscheme[1]);
-
-        if (modif) {
-            str fttl = (i32) ttl.length() > (parent->getszx() - 8)? ttl.substr(0, parent->getszx() - 7) : ttl;
-            parent->__gwndacs ()->outatclr (wnd.getszx() / 2 - fttl.length() / 2 + 1, 0, "*", colorscheme[1]);
-        };
-    };
+void LUIC::Editor::SetTabSize(ui8 p_TabSize) {
+	TabSize = p_TabSize;
 };
 
-void LUIC::editor::input(i16 p_in, MEVENT* p_evt) {
-    if (ioh == NULL || !vsble) return;
+ui8 LUIC::Editor::GetTabSize() {
+	return TabSize;
+};
 
-    switch (p_in) {
-        case KEY_MOUSE: {
-            if (p_evt->bstate & BUTTON1_RELEASED) {
-                if (prsd)
-                    prsd  = false;
-            } else if (p_evt->bstate & BUTTON1_PRESSED) {
-                if (ioh->__gchldfcsed()) return;
+void LUIC::Editor::Draw() {
+	if (IOH == NULL or !Visible)
+		return;
 
-                if (!(p_evt->x >= wnd .getposx () && 
-                      p_evt->y >= wnd .getposy () && 
-                    
-                      p_evt->x < wnd .getszx () + wnd .getposx () && 
-                      p_evt->y < wnd .getszy () + wnd .getposy ())) {
-                    infcs = false;
-                    
-                    break;
-                };
-                
-                prsd  = true;
-                infcs = true;
+	if (Parent == NULL)
+		Wnd.DrawShadow(ColorScheme[0]);
 
-                curx = p_evt->x - (parent == NULL? getposx () : parent->getposx ()) + scrx - 1;
-                cury = p_evt->y - (parent == NULL? getposy () : parent->getposy ()) + scry - 1;
+	Wnd.SetBackgroundColor(ColorScheme[2]);
 
-                curpos  = 0;
-                ui32 cx = 0, 
-                     cy = 0;
+	str fText = __shptxtbuf(Text, ScrollX, ScrollY, GetSizeX() + ScrollX, GetSizeY() + ScrollY);
+	ui16 rndrx = 0, rndry = 0;
+	bool currendered = false;
 
-                for (ui32 i = 0; i < (ui32)txt.length(); ++ i) {
-                    if (txt[i] == 10) {
-                        ++ cy;
+	for (ui32 i = 0; i <= (ui32)fText.length(); ++ i) {
+		bool curon = false;
 
-                        curpos = i + 1;
-                    };
+		if (rndrx == CurX + CurOff - ScrollX and rndry == CurY - ScrollY and InFocus and not currendered) {
+			if (CurRender)
+				Wnd.SetAttribute(A_REVERSE, true);
 
-                    if (cury == cy) break;
-                };
+			curon = true;
+			currendered = true;
+		};
 
-                if (cury != cy) cury = cy;
+		if (i < fText.length() and fText[i] != 10) {
+			Wnd.OutAt(rndrx, rndry, fText[i] > 31 and fText[i] < 127? str(1, fText[i]) : " ");
+
+			++ rndrx;
+		} else {
+			if (curon)
+				Wnd.OutAt(rndrx, rndry, " ");
+
+			if (fText[i] == 10) {
+				rndrx = 0;
+
+				++ rndry;
+			};
+		};
+
+		if (curon)
+			Wnd.SetAttribute(A_REVERSE, false);
+	};
+
+	if (Parent != NULL) {
+		str footer = std::to_string(CurY) + ":" + std::to_string(CurX) + " | Mem: " + std::to_string(Text.length()) + "B | FT: " + FT + " | EN: ASCII";
+		footer = footer.substr(0, Parent->GetSizeX() - 2);
 
-                for (ui32 i = curpos; i <= (ui32)txt.length(); ++ i) {
-                    if (txt[i] == 10 || cx == curx || i == (ui32)txt.length()) {
-                        curx = cx;
-                        curpos += curx;
+		Parent->__gwndacs()->OutAt(1, Parent->GetSizeY () - 1, footer, ColorScheme[1]);
 
-                        break;
-                    };
+		if (Modif) {
+			str fttl = (i32) Title.length() > (Parent->GetSizeX() - 8)? Title.substr(0, Parent->GetSizeX() - 7) : Title;
+			Parent->__gwndacs()->OutAt (Wnd.GetSizeX() / 2 - fttl.length() / 2 + 1, 0, "*", ColorScheme[1]);
+		};
+	};
+};
 
-                    ++ cx;
-                };
+void LUIC::Editor::Input(i16 p_Input, MEVENT* p_Event) {
+	if (IOH == NULL or not Visible)
+		return;
 
-                ioh->__schldfcsed (false);
-                __fcsprnts ();
-            };
+	if (Flags & LUIC_FLAGS_EDITOR_CURSORBLINK) {
+		if (IOH->GetTick() % 64 == 0)
+			CurRender = not CurRender;
 
-            break;
-        };
+		if (p_Input > 0 and p_Input <= 127)
+			CurRender = true;
+	};
 
-        case 27: {
-            if (!infcs) break;
-            infcs = false;
+	switch (p_Input) {
+		case KEY_MOUSE: {
+			if (p_Event->bstate & BUTTON1_RELEASED) {
+				if (Pressed)
+					Pressed = false;
+			} else if (p_Event->bstate & BUTTON1_PRESSED) {
+				if (IOH->__gchldfcsed())
+					return;
 
-            break;
-        };
+				bool PosCheck = p_Event->x >= Wnd.GetPosX() and p_Event->y >= Wnd.GetPosY();
+				bool BRCornerCheck = p_Event->x < Wnd.GetSizeX() + Wnd.GetPosX() and p_Event->y < Wnd.GetSizeY() + Wnd.GetPosY();
 
-        case 10: {
-            if (!infcs) break;
-            
-            modif = true;
+				if (not (PosCheck and BRCornerCheck)) {
+					InFocus = false;
 
-            txt  .insert(curpos, "\n");
-            curx =       0;
+					break;
+				};
 
-            ++ cury;
-            ++ curpos;
+				Pressed = true;
+				InFocus = true;
 
-            break;
-        };
+				CurX = p_Event->x - (Parent == NULL? GetPosX() : Parent->GetPosX()) + ScrollX - 1;
+				CurY = p_Event->y - (Parent == NULL? GetPosY() : Parent->GetPosY()) + ScrollY - 1;
 
-        case 9: {
-            if (!infcs) break;
+				CurPos = 0;
+				CurRender = true;
+				ui32 cx = 0;
+				ui32 cy = 0;
 
-            modif = true;
+				for (ui32 i = 0; i < (ui32)Text.length(); ++ i) {
+					if (CurY == cy)
+						break;
 
-            txt   .insert(curpos, "    ");
-            curx   +=     4;
-            curpos +=     4;
+					if (Text[i] == 10) {
+						++ cy;
 
-            break;
-        };
+						CurPos = i + 1;
+					};
+				};
 
-        case KEY_BACKSPACE: {
-            if (!infcs) break;
-            if (curpos == 0) break;
+				if (CurY != cy)
+					CurY = cy;
 
-            modif = true;
+				for (ui32 i = CurPos; i <= (ui32)Text.length(); ++ i) {
+					if (Text[i] == 10 or cx >= CurX or i == (ui32)Text.length()) {
+						CurX = cx;
+						CurPos += CurX;
 
-            if (txt[curpos - 1] == 10) {
-                ui32 idx = txt.substr(0, curpos - 1).find_last_of(10);
-                if (idx == txt.npos) idx = 0;
+						break;
+					};
 
-                curx = curpos - idx - 2;
+					if (Text[i] == 9) {
+						if (cx + 2 >= CurX) {
+							CurX = cx;
+							continue;
+						} else if (cx + 4 >= CurX)
+							CurX = cx + 1;
+						else
+							CurX -= TabSize - 1;
+					};
 
-                -- cury;
-            } else 
-                -- curx;
+					++ cx;
+				};
 
-            txt.erase(curpos - 1, 1);
+				IOH->__schldfcsed(false);
+				__fcsprnts();
+			};
 
-            -- curpos;
+			break;
+		};
 
-            break;
-        };
+		case 27: {
+			if (not InFocus)
+				break;
 
-        case KEY_LEFT: {
-            if (!infcs) break;
-            if (curpos == 0) break;
+			InFocus = false;
 
-            modif = true;
+			break;
+		};
 
-            if (txt[curpos - 1] == 10) {
-                ui32 idx = txt.substr(0, curpos - 1).find_last_of(10);
-                
-                if (idx == txt.npos) idx = 0;
+		case 10: {
+			if (not InFocus)
+				break;
 
-                curx = curpos - idx - 2;
+			Modif = true;
 
-                -- cury;
-            } else 
-                -- curx;
+			Text.insert(CurPos, "\n");
+			CurX = 0;
 
-            -- curpos;
+			++ CurY;
+			++ CurPos;
 
-            break;
-        };
+			break;
+		};
 
-        case KEY_RIGHT: {
-            if (!infcs) break;
-            if (curpos == txt.length()) break;
+		case 127: case KEY_BACKSPACE: {
+			if (not InFocus or CurPos == 0)
+				break;
 
-            if (txt[curpos] == 10) {
-                curx = 0;
+			Modif = true;
+			CurRender = true;
 
-                ++ cury;
-            } else
-                ++ curx;
+			if (Text[CurPos - 1] == 10) {
+				ui32 idx = Text.substr(0, CurPos - 1).find_last_of(10);
 
-            ++ curpos;
+				if (idx == Text.npos)
+					idx = 0;
 
-            break;
-        };
+				CurX = CurPos - idx - 2;
+				-- CurY;
+			} else
+				-- CurX;
 
-        case KEY_UP: {
-            if (!infcs) break;
+			Text.erase(CurPos - 1, 1);
 
-            ui32 cx = curx;
+			-- CurPos;
 
-            -- cury;
-            -- curpos;
+			break;
+		};
 
-            for (i32 i = curpos; i >= -1; -- i) {
-                if (txt[i] == 10) {
-                    cx = 0;
-                    -- curpos;
+		case KEY_LEFT: {
+			if (not InFocus or CurPos == 0)
+				break;
 
-                    for (i32 i = curpos; i >= -1; -- i) {
-                        if (txt[i] == 10 || i == -1) break;
+			CurRender = true;
 
-                        -- curpos;
-                        ++ cx;
-                    };
+			if (Text[CurPos - 1] == 10) {
+				ui32 idx = Text.substr(0, CurPos - 1).find_last_of(10);
 
-                    if (curx > cx) curx = cx;
-                    curpos += curx + 1;
+				if (idx == Text.npos)
+					idx = 0;
 
-                    break;
-                };
+				CurX = CurPos - idx - 2;
+				-- CurY;
+			} else
+				-- CurX;
 
-                if (i == -1) {
-                    curx = cx;
-                    ++ cury;
-                    ++ curpos;
+			-- CurPos;
 
-                    break;
-                };
+			break;
+		};
 
-                -- curpos;
-                -- cx;
-            };
+		case KEY_RIGHT: {
+			if (not InFocus or CurPos == Text.length())
+				break;
 
-            break;
-        };
+			CurRender = true;
 
-        case KEY_DOWN: {
-            if (!infcs) break;
+			if (Text[CurPos] == 10) {
+				CurX = 0;
+				++ CurY;
+			} else
+				++ CurX;
 
-            ui32 cx = curx;
+			++ CurPos;
 
-            ++ cury;
+			break;
+		};
 
-            for (ui32 i = curpos; i <= (ui32)txt.length(); ++ i) {
-                if (txt[i] == 10) {
-                    cx = 0;
-                    ++ curpos;
+		case KEY_UP: {
+			if (not InFocus)
+				break;
 
-                    for (ui32 i = curpos; i <= (ui32)txt.length(); ++ i) {
-                        if (txt[i] == 10 || i == (ui32)txt.length() || cx == curx) break;
+			ui32 cx = CurX;
+			CurRender = true;
 
-                        ++ curpos;
-                        ++ cx;
-                    };
+			-- CurY;
+			-- CurPos;
 
-                    curx = cx;
+			for (i32 i = CurPos; i >= -1; -- i) {
+				if (Text[i] == 10) {
+					cx = 0;
+					i32 j = 0;
+					CurX += CurOff;
+					-- CurPos;
 
-                    break;
-                };
+					for (i32 i = CurPos; i >= -1; -- i) {
+						if (Text[i] == 10 or i == -1)
+							break;
 
-                if (i == txt.length()) {
-                    curx = cx;
-                    -- cury;
+						if (Text[HigherLinePos + cx] == 9)
+							if (cx < CurX) {
+								++ j;
+								if (cx + 2 >= CurX)
+									CurX = cx;
+								else if (cx + 4 >= CurX)
+									CurX = cx + 1;
+								else
+									CurX -= TabSize - 1;
+							};
 
-                    break;
-                };
+						-- CurPos;
+						++ cx;
+					};
 
-                ++ curpos;
-                ++ cx;
-            };
+					FT = std::to_string(HigherLinePos);
 
-            break;
-        };
+					if (CurX > cx)
+						CurX = cx;
 
-        default: {
-            if (!infcs) break;
-            if (p_in < 32 || p_in > 126) break;
+					CurPos += CurX + 1;
 
-            modif = true;
+					break;
+				};
 
-            str chr =       "";
-                chr += (i8) p_in;
+				if (i == -1) {
+					CurX = cx;
+					++ CurY;
+					++ CurPos;
 
-            txt.insert(curpos, chr);
+					break;
+				};
 
-            ++ curx;
-            ++ curpos;
+				-- CurPos;
+				-- cx;
+			};
 
-            break;
-        };
-    };
+			break;
+		};
 
-    if ((i16)curx - (i16)scrx >= wnd.getszx() - 1) 
-        scrx = curx - (wnd.getszx() - 1);
-    else if ((i16)curx - (i16)scrx < 0) 
-        scrx = curx;
+		case KEY_DOWN: {
+			if (not InFocus)
+				break;
 
-    if ((i16)cury - (i16)scry >= wnd.getszy() - 1) 
-        scry = cury - (wnd.getszy() - 1);
-    else if ((i16)cury - (i16)scry < 0) 
-        scry = cury;
+			ui32 cx = CurX;
+			CurRender = true;
+
+			++ CurY;
+
+			for (ui32 i = CurPos; i <= (ui32)Text.length(); ++ i) {
+				if (Text[i] == 10) {
+					CurX += CurOff;
+					cx = 0;
+					++ CurPos;
+
+					for (ui32 i = CurPos; i <= (ui32)Text.length(); ++ i) {
+						if (Text[i] == 10 or i == (ui32)Text.length() or cx == CurX)
+							break;
+
+						if (Text[i] == 9)
+							if (cx < CurX) {
+								if (cx + 2 >= CurX) {
+									CurX = cx;
+
+									break;
+								} else if (cx + 4 >= CurX)
+									CurX = cx + 1;
+								else
+									CurX -= TabSize - 1;
+							};
+
+						++ CurPos;
+						++ cx;
+					};
+
+					CurX = cx;
+
+					break;
+				};
+
+				if (i == Text.length()) {
+					CurX = cx;
+					-- CurY;
+
+					break;
+				};
+
+				++ CurPos;
+				++ cx;
+			};
+
+			break;
+		};
+
+		default: {
+			if (not InFocus or ((p_Input < 32 or p_Input > 126) and p_Input != 9))
+				break;
+
+			Modif = true;
+
+			Text.insert(CurPos, str(1, p_Input));
+
+			++ CurX;
+			++ CurPos;
+
+			break;
+		};
+	};
+
+	if ((sword)CurX + (sword)CurOff - (sword)ScrollX < 0)
+		ScrollX = CurX + CurOff;
+	else if (CurX + CurOff - ScrollX >= (ui32)Wnd.GetSizeX() - 1)
+		ScrollX = CurX + CurOff - ((ui32)Wnd.GetSizeX() - 1);
+
+	if ((sword)CurY - (sword)ScrollY < 0)
+		ScrollY = CurY;
+	else if (CurY - ScrollY >= (ui32)Wnd.GetSizeY() - 1)
+		ScrollY = CurY - ((ui32)Wnd.GetSizeY() - 1);
+};
+
+str LUIC::Editor::__shptxtbuf(str p_Text, ui32 p_X, ui32 p_Y, ui32 p_szx, ui32 p_szy) {
+	str shpdstr = "";
+	ui32 PosX = 0, PosY = 0;
+	CurOff = 0;
+	HigherLinePos = 0;
+	ui32 HigherLinePosOff = 0;
+
+	for (ui32 i = 0; i < p_Text.length(); ++ i) {
+		if (((PosX >= p_X and PosX < p_szx) or p_Text[i] == 10) and PosY >= p_Y and PosY < p_szy)
+			shpdstr += p_Text[i];
+
+		switch (p_Text[i]) {
+			case 9: {
+				p_Text[i] = 32;
+				p_Text.insert(i, str(TabSize - 1, 32));
+
+				if (PosY < CurY)
+					HigherLinePosOff += TabSize - 1;
+
+				if (PosY != CurY)
+					break;
+
+				if (PosX < CurX + CurOff)
+					CurOff += TabSize - 1;
+
+				break;
+			};
+
+			case 10: {
+				PosX = -1;
+				++ PosY;
+
+				if (PosY + 1 == CurY)
+					HigherLinePos = i - HigherLinePosOff + 1;
+
+				break;
+			};
+		};
+
+		++ PosX;
+	};
+
+	return shpdstr;
 };
