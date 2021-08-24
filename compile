@@ -18,7 +18,7 @@ if g++ -g src/*.cc -o bin/app -O3 -s -Wall -std=c++17 -lstdc++fs -lncursesw; the
     printf "\e[0;36m* CMPL: \e[0;32mCompiled Succesfully\n";
 
     printf "\e[0;36m* CMPL: \e[0;33mCopying binary "app" to "/usr/bin" as "tr-ed"...\n\e[0m";
-    sudo cp ./bin/tr-ed /usr/bin/
+    sudo cp ./bin/app /usr/bin/tr-ed
     printf "\e[0;36m* CMPL: \e[0;32mDone.\n";
 else
     printf "\e[0;36m* CMPL: \e[0;31mCompilation Failed\n";
