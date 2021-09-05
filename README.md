@@ -11,6 +11,7 @@
 		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
 	</a>
 	<br>
+
 	<img src="pic/img.png"/>
 </p>
 
