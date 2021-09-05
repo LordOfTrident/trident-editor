@@ -1,5 +1,16 @@
+<p align="center">
 # Trident Editor
 A free terminal text editor for Linux
+	<a href="./LICENSE">
+		<img alt="License" src="GNU?color=0088ff"/>
+	</a>
+	<a href="https://github.com/LordsTrident/trident-editor/issues">
+		<img alt="Issues" src="https://img.shields.io/github/issues/LordsTrident/trident-editor?color=0088ff"/>
+	</a>
+	<a href="https://github.com/LordsTrident/trident-editor/pulls">
+		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
+	</a>
+</p>
 
 <img src="pic/img.png"/>
 
