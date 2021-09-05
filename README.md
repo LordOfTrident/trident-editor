@@ -1,6 +1,5 @@
 <h1 align="center">Trident Editor</h2>
 <p align="center">A free terminal text editor for Linux</p>
-<br>
 <p align="center">
 	<a href="./LICENSE">
 		<img alt="License" src="https://img.shields.io/badge/license-GNU-blue?color=7aca00"/>
@@ -11,6 +10,7 @@
 	<a href="https://github.com/LordsTrident/trident-editor/pulls">
 		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
 	</a>
+	<br>
 	<img src="pic/img.png"/>
 </p>
 
