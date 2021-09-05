@@ -1,18 +1,18 @@
-<h1 align="center">Trident Editor</h2>
-<p align="center">A free terminal text editor for Linux</p>
-<p align="center">
-	<a href="./LICENSE">
-		<img alt="License" src="https://img.shields.io/badge/license-GNU-blue?color=7aca00"/>
-	</a>
-	<a href="https://github.com/LordsTrident/trident-editor/issues">
-		<img alt="Issues" src="https://img.shields.io/github/issues/LordsTrident/trident-editor?color=0088ff"/>
-	</a>
-	<a href="https://github.com/LordsTrident/trident-editor/pulls">
-		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
-	</a>
-	<br><br><br>
-	<img src="pic/img.png"/>
-</p>
+<h1>Trident Editor</h2>
+<p>A free terminal text editor for Linux</p>
+
+<a href="./LICENSE">
+	<img alt="License" src="https://img.shields.io/badge/license-GNU-blue?color=7aca00"/>
+</a>
+<a href="https://github.com/LordsTrident/trident-editor/issues">
+	<img alt="Issues" src="https://img.shields.io/github/issues/LordsTrident/trident-editor?color=0088ff"/>
+</a>
+<a href="https://github.com/LordsTrident/trident-editor/pulls">
+	<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
+</a>
+<br><br><br>
+<img src="pic/img.png"/>
+
 
 ## Compiling and running
 Compile Trident Editor by running the compile file as bash:
