@@ -3,7 +3,7 @@
 <br>
 <p align="center">
 	<a href="./LICENSE">
-		<img alt="License" src="GNU?color=0088ff"/>
+		<img alt="License" src="color=0088ff"/>
 	</a>
 	<a href="https://github.com/LordsTrident/trident-editor/issues">
 		<img alt="Issues" src="https://img.shields.io/github/issues/LordsTrident/trident-editor?color=0088ff"/>
