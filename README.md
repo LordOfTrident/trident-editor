@@ -1,3 +1,4 @@
+<center>
 <p align="center">
 
 # Trident Editor
@@ -12,6 +13,7 @@ A free terminal text editor for Linux<br>
 		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
 	</a>
 </p>
+</center>
 
 <img src="pic/img.png"/>
 
