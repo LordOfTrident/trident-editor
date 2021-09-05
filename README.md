@@ -1,8 +1,8 @@
-<center>
 <p align="center">
 
-# Trident Editor
-A free terminal text editor for Linux<br>
+<h1 align="center">Trident Editor</h2>
+<p align="center">A free terminal text editor for Linux</p>
+<br>
 	<a href="./LICENSE">
 		<img alt="License" src="GNU?color=0088ff"/>
 	</a>
@@ -13,7 +13,6 @@ A free terminal text editor for Linux<br>
 		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
 	</a>
 </p>
-</center>
 
 <img src="pic/img.png"/>
 
