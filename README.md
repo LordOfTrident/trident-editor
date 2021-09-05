@@ -1,4 +1,5 @@
 <p align="center">
+
 # Trident Editor
 A free terminal text editor for Linux
 	<a href="./LICENSE">
