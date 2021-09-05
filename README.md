@@ -11,9 +11,8 @@
 		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordsTrident/trident-editor?color=0088ff"/>
 	</a>
 	<br><br><br>
-	<img src="pic/img.png"/>
+	<img width="700px" src="pic/img.png"/>
 </p>
-
 
 ## Compiling and running
 Compile Trident Editor by running the compile file as bash:
