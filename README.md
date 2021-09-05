@@ -1,8 +1,7 @@
-<p align="center">
-
 <h1 align="center">Trident Editor</h2>
 <p align="center">A free terminal text editor for Linux</p>
 <br>
+<p align="center">
 	<a href="./LICENSE">
 		<img alt="License" src="GNU?color=0088ff"/>
 	</a>
