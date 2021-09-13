@@ -2,7 +2,7 @@
 <p align="center">A free terminal text editor for Linux</p>
 <p align="center">
 	<a href="./LICENSE">
-		<img alt="License" src="https://img.shields.io/badge/license-GNU-blue?color=7aca00"/>
+		<img alt="License" src="https://img.shields.io/badge/license-GPL-blue?color=7aca00"/>
 	</a>
 	<a href="https://github.com/LordOfTrident/trident-editor/issues">
 		<img alt="Issues" src="https://img.shields.io/github/issues/LordOfTrident/trident-editor?color=0088ff"/>
